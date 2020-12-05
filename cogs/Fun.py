@@ -10,9 +10,9 @@ class Fun(commands.Cog):
 		self.bot = bot
 
 	@commands.command(
-		aliases=["quote"],
+		aliases=["quote", ],
 		help="Shows a random llama quote.",
-		usage="`{prefix}quote`"
+		usage="> {prefix}{command}"
 	)
 	async def llama(self, ctx):
 		# the reason why I don't use random.choice is because it may give two of the same result consecutively.
@@ -21,9 +21,9 @@ class Fun(commands.Cog):
 	@commands.command(
 		help="""Detects user's penis length.
 This is 101% accurate.""",
-		usage="""`{prefix}penis <user1> <user2> ...`
+		usage="""> {prefix}{command} *<user>
 ex:
-> {prefix}penis <@501277805540147220> <@641574882382970891>"""
+> {prefix}{command} <@501277805540147220> <@641574882382970891>"""
 	)
 	async def penis(self, ctx, *users: discord.Member):
 		dongs = {}
@@ -48,33 +48,17 @@ ex:
 
 	@commands.command(
 		help="Owoifies your message. OwO",
-		usage="""`{prefix}owo <text>`
+		usage="""> {prefix}{command} <text>
 ex:
-`{prefix}owo hello there my old friend`"""
+> {prefix}{command} hello there my old friend"""
 
 	)
 	async def owo(self, ctx, *text):
 		await ctx.send(nekos.owoify(" ".join(text)))
 
 	@commands.command(
-		help="Shows you neko waifu <3",
-		usage="`{prefix}neko`"
-	)
-	async def neko(self, ctx):
-		neko_url = nekos.img("neko")
-		await ctx.send(
-			embed=
-			discord.Embed(
-				title="Neko",
-				description=f"requested by: {ctx.message.author.mention}\n**[Link if you don't see the image]({neko_url})**"
-			)
-			.set_image(url=neko_url)
-			.set_footer(text=f"powered by nekos.life")
-		)
-
-	@commands.command(
 		help="Shows image matching search term",
-		usage="""`{prefix}img <target>`
+		usage="""> {prefix}{command} <target>
 Can chose from:
 **NSFW**:
 `feet`, `yuri`, `trap`, `futanari`, `hololewd`, `lewdkemo`, `solog`, `feetg`, `cum`, `erokemo`, `les`, `wallpaper`, `lewdk`, `tickle`, `lewd`, `eroyuri`, `eron`, `cum_jpg`, `bj`, 'nsfw_neko_gif', `solo`, `kemonomimi`, `nsfw_avatar`, `gasm`, `anal`, `hentai`, `avatar`, `erofeet`, `holo`, `keta`, `blowjob`, `pussy`, `tits`, `holoero`, `pussy_jpg`, `pwankg`, `classic`, `kuni`, `kiss`, `femdom`, `neko`, `spank`, `erok`, `boobs`, `random_hentai_gif`, `smallboobs`, `ero`
@@ -82,7 +66,7 @@ Can chose from:
 `feed`, `gecg`, `poke`, `slap`, `lizard`, `waifu`, `pat`, `8ball`, `cuddle`, `fox_girl`, `hug`, `smug`, `goose`, `baka`, `woof`
 
 ex:
-`{prefix}img waifu`"""
+> {prefix}{command} neko"""
 	)
 	async def img(self, ctx, target: str):
 		non_nsfw = [
@@ -128,7 +112,7 @@ ex:
 
 	@commands.command(
 		help="Shows you useless fact.",
-		usage="`{prefix}fact`"
+		usage="> {prefix}{command}"
 	)
 	async def fact(self, ctx):
 		await ctx.send(embed=discord.Embed(title="Fact of the day", description=nekos.fact()))

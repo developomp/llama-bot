@@ -14,7 +14,7 @@ class Core(commands.Cog):
 
 	@commands.command(
 		help="Shows very basic information about the bot.",
-		usage="`{prefix}about`"
+		usage="> {prefix}{command}"
 	)
 	async def about(self, ctx):
 		uptime = str(timedelta(seconds=int(round(time() - self.bot.start_time))))
@@ -34,13 +34,18 @@ class Core(commands.Cog):
 		)
 
 	@commands.command(
-		aliases=["h"],
+		aliases=["h", ],
 		help="Shows list of helpful information about a command or a cog.",
-		usage="""`{prefix}help <cog|command|None>`
+		usage="""> {prefix}{command} <cog | command | None>
 ex:
-`{prefix}help` (list cogs)
-`{prefix}help core` (list commands under core cog)
-`{prefix}help ping` (shows info about ping command)"""
+List cogs:
+> {prefix}{command}
+
+List commands in the `core` cog:
+> {prefix}{command} core
+
+Shows info about `ping` command:
+> {prefix}{command} ping"""
 	)
 	async def help(self, ctx, cog_str=None):
 		cogs = list(self.bot.cogs.keys())
@@ -101,8 +106,8 @@ ex:
 		await ctx.send(embed=help_embed)
 
 	@commands.command(
-		help="Call for help",
-		usage="{prefix}fix"
+		help="Call for help.",
+		usage="> {prefix}{command}"
 	)
 	async def fix(self, ctx: discord.ext.commands.Context):
 		await ctx.send(f"Yo {', '.join([f'<@{fixer_id}>' for fixer_id in self.bot.fixer_ids])} fix this shit")

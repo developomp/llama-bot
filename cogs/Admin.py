@@ -22,23 +22,25 @@ def must_be_admin():
 
 class Admin(commands.Cog):
 	# todo: refresh bot
+
 	def __init__(self, bot):
 		self.bot = bot
 
 	@commands.command(
-		aliases=["db"],
+		aliases=["db", ],
 		help="Read/write from/to database. Incomplete",
-		usage="""> {prefix}database <operation> <scope> <data>
-operation: read, write
-scope: database path, all (all is only available for read operation)
-data: data to be overwritten in write command. Ignored for write operation.
+		usage="""> {prefix}{command} <operation> <scope> <data>
+operation: read, r | write, w
+scope: firestore database path | all, a (all is only available for read operation)
+data: data to be overwritten in write command. Only available in write operation.
 ex:
-> {prefix}database read all"""
+> {prefix}{command} read all"""
 	)
 	@must_be_admin()
-	async def database(self, ctx, operation, scope, data=None):
-		if ctx.message.channel.id not in [self.bot.VARS['channels']['ADMIN_BOT'], ]:
-			ctx.send(embed=discord.Embed(title="Oops", description=f"Admin commands can only be executed in <#{self.bot.VARS['channels']['ADMIN_BOT']}>"))
+	async def database(self, ctx, operation: str, scope: str, data: str = None):
+		available_channel_ids = [self.bot.VARS["channels"]["ADMIN_BOT"], ]
+		if ctx.message.channel.id not in available_channel_ids:  # todo: make it expandable
+			ctx.send(embed=discord.Embed(title="Oops", description=f"Admin commands can only be executed in: {', '.join([f'<#{channel_id}>' for channel_id in available_channel_ids])}>"))
 			return
 
 		if operation in ["read", "r"]:

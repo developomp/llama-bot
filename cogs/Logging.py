@@ -36,7 +36,7 @@ class Logging(commands.Cog):
 
 	@commands.command(
 		help="Shows the most recently deleted message and its content. Memory gets wiped after some time.",
-		usage="""`{prefix}snipe`
+		usage="""> {prefix}{command}
 Use it after someone edited/deleted their message."""
 	)
 	async def snipe(self, ctx):
@@ -55,7 +55,7 @@ Use it after someone edited/deleted their message."""
 
 	@commands.command(
 		help="Shows most recently edited message and it's content before and after the edit. Memory gets wiped after some time.",
-		usage="""`{prefix}editsnipe`
+		usage="""> {prefix}{command}
 Use it after someone edited their message."""
 	)
 	async def editsnipe(self, ctx):

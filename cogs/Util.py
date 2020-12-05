@@ -10,9 +10,9 @@ class Util(commands.Cog):
 
 	@commands.command(
 		help="Calculates of when a discord ID (aka snowflake) was created.",
-		usage="""`{prefix}snowflake <snowflake>`
+		usage="""> {prefix}{command} <snowflake>
 ex:
-`{prefix}snowflake 501277805540147220`"""
+> {prefix}{command} 501277805540147220"""
 	)
 	async def snowflake(self, ctx, snowflake_to_parse):
 		try:
@@ -26,7 +26,7 @@ ex:
 
 	@commands.command(
 		help="Measures communication delay(latency) in 1/1000 of a second (millisecond/ms).",
-		usage="`{prefix}ping`"
+		usage="> {prefix}{command}"
 	)
 	async def ping(self, ctx):
 		message_latency = int((datetime.now() - ctx.message.created_at).microseconds / 1000)

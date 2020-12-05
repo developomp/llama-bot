@@ -88,19 +88,31 @@ class WarBrokers(commands.Cog):
 
 	@commands.command(
 		help="Sets/updates data in the database.",
-		usage="""`{prefix}set <uid | weapon | time | server>`
-`{prefix}set <uid>` (ex: `{prefix}set 5d2ead35d142affb05757778`)
-**Must run this before running other stat commands**
+		usage="""> {prefix}{command} <field> <data>
+field: uid | weapon | time | server
+data: anything that comes after the field
+
+> {prefix}{command} uid <uid>
+**Must run this before running other set commands**
 Correlates WB uid with your discord ID. Must be a valid WB uid.
+Only correlates with one uid. Alt accounts are not supported yet.
+ex:
+> {prefix}{command} uid 5d2ead35d142affb05757778
 
-`{prefix}set weapon <weapon>` (ex: `{prefix}set weapon Sniper & AR`)
+> {prefix}{command} weapon <weapon>
 Sets your preferred weapon. No input specifications.
+ex:
+> {prefix}{command} weapon Sniper & AR
 
-`{prefix}set time <time>` (ex: `{prefix}set time UTC+8`)
+> {prefix}{command} time <time>
 Sets your time zone. No input specifications.
+ex:
+> {prefix}{command} time UTC+8
 
-`{prefix}set server <server1> <server2> ...` (ex: `{prefix}set server ASIA USA`)
+> {prefix}{command} server <server1> <server2> ...
 Sets the servers you usually play on. Use `{prefix}set server help` to get more info.
+ex:
+> {prefix}{command} server ASIA USA
 """
 	)
 	async def set(self, ctx, a1, *args):
@@ -173,10 +185,13 @@ ex: `-set server ASIA USA`"""))
 			await ctx.send(embed=discord.Embed(description=f"You'll have to register first. Try using `{self.bot.command_prefix}help set`"))
 
 	@commands.command(
-		help="Removes a data from the database.",
-		usage="""`{prefix}rm <arg1> <arg2> ...` (choose from: `weapon`, `time`, `server`)
+		help="Removes data from the database.",
+		usage="""> {prefix}{command} *<data to remove>
+data to remove: weapon | time | server
+
 ex:
-`{prefix}rm time server`
+Removes time and weapon data from the database
+> {prefix}{commands} time weapon
 """
 	)
 	async def rm(self, ctx, a1):
