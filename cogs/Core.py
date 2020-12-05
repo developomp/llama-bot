@@ -61,7 +61,6 @@ Shows info about `ping` command:
 				try:
 					cog = self.bot.get_cog(cog_name)
 					for field in cog.main_help_fields:
-						print(field)
 						help_embed.add_field(name=field[0], value=field[1], inline=False)
 				except AttributeError:
 					# cog doesn't have main_help_fields
