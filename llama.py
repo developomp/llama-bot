@@ -16,9 +16,7 @@ import re
 
 
 class Llama(commands.Bot):
-	# todo: search for 501277805540147220 in the project
 	# todo: less firestore calls (cache locally?)
-	# todo: use {command} for all cog helps
 
 	def __init__(self, firebase_cred_path: str, prefix: str = "-"):
 		super().__init__(
@@ -37,13 +35,13 @@ class Llama(commands.Bot):
 		self.quotes = self.VARS["settings"]["quotes"]
 		random.shuffle(self.quotes)
 
-		self.owner_ids = {501277805540147220, 396333737148678165}  # Can run owner only commands
-		self.fixer_ids = [501277805540147220]  # Pinged/DMed when there's an issue with the bot
+		self.owner_ids: set = {501277805540147220, 396333737148678165}  # Can run owner only commands
+		self.fixer_ids: set = {501277805540147220}  # Pinged/DMed when there's an issue with the bot
 
 	# ----- [ DISCORD.PY STUFF ] -----
 
 	async def on_ready(self):
-		self.LP_SERVER = next((guild for guild in self.guilds if guild.id == 457373827073048604), None)
+		self.LP_SERVER: discord.Guild = next((guild for guild in self.guilds if guild.id == 457373827073048604), None)
 		if not self.LP_SERVER:
 			print("----------[ The bot is not in LP server! ]----------")
 			exit(-6969)
