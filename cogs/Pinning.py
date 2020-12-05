@@ -1,5 +1,6 @@
 # Original code from: https://github.com/aurzen/pinbot
 import re
+import operator
 import traceback
 
 import discord
@@ -193,7 +194,31 @@ or
 	)
 	async def pinnable(self, ctx: discord.ext.commands.Context):
 		# todo: show categories
-		description = "\n- "+"\n- ".join([channel.mention for channel in self.pinnable_channels]) if self.pinnable_channels else "No channels have reaction pinning enabled yet."
+		# todo: hidden channels
+		# todo: no category
+
+		sorted_channels = sorted(self.pinnable_channels, key=operator.attrgetter("position"))
+
+		description: str = ""
+		previous_channel_category_id: int = int()
+		previous_channel_had_category: bool = bool()
+
+		for channel in sorted_channels:
+			if channel.category_id:
+				previous_channel_had_category = True
+				if previous_channel_category_id != channel.category_id:
+					previous_channel_category_id = channel.category_id
+					description += f"\n**{channel.category.name.upper()}**\n"
+				description += f"    - {channel.mention}\n"
+			else:
+				if previous_channel_had_category:
+					description += f"\n"
+				previous_channel_had_category = False
+				description += f"- {channel.mention}\n"
+
+		if not sorted_channels:
+			description = "No channels have reaction pinning enabled yet."
+
 		await ctx.send(embed=discord.Embed(title="Channels with reaction pinning enabled", description=description))
 
 	@commands.command(
