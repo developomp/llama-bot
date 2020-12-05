@@ -1,0 +1,4 @@
+discord.py
+git+https://github.com/developomp/wbscraper.git#egg=wbscraper
+firebase_admin
+nekos.py
