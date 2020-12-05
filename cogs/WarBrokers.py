@@ -7,8 +7,13 @@ from discord.ext import commands
 # todo: add change/remove uid feature
 class WarBrokers(commands.Cog):
 	def __init__(self, bot):
-		self.help_msg = "<#475048014604402708> and <#693401827710074931> automatically updates when the contents of the database is changed."
 		self.bot = bot
+
+		self.LLAMA_BOT = self.bot.get_channel_from_vars("LLAMA_BOT")
+		self.ADMIN_BOT = self.bot.get_channel_from_vars("ADMIN_BOT")
+		self.BOT_WORK = [self.LLAMA_BOT, self.ADMIN_BOT]
+
+		self.help_msg = "<#475048014604402708> and <#693401827710074931> automatically updates when the contents of the database is changed."
 
 	async def update_player(self, user_id):
 		player = self.bot.llama_firebase.read("players", user_id)
@@ -46,7 +51,7 @@ class WarBrokers(commands.Cog):
 		)
 
 		# update if stat message is in the database, add to the database otherwise.
-		lp_info_channel = self.bot.get_channel(int(self.bot.VARS["channels"]["LLAMAS_AND_PYJAMAS_INFO"]))
+		lp_info_channel = self.bot.get_channel_from_vars("LLAMAS_AND_PYJAMAS_INFO")
 		try:
 			stat_msg = await lp_info_channel.fetch_message(player["message_id"])
 			await stat_msg.edit(embed=embed)
@@ -78,7 +83,7 @@ class WarBrokers(commands.Cog):
 			description=description
 		)
 
-		active_roster_channel = self.bot.get_channel(int(self.bot.VARS["channels"]["ACTIVE"]))
+		active_roster_channel = self.bot.get_channel_from_vars("ACTIVE")
 		try:
 			active_msg = await active_roster_channel.fetch_message(int(self.bot.VARS["messages"]["ACTIVE"]))
 			await active_msg.edit(embed=embed)
@@ -115,47 +120,53 @@ ex:
 > {prefix}{command} server ASIA USA
 """
 	)
-	async def set(self, ctx, a1, *args):
-		if not any(role in self.bot.LLAMA_PERMS for role in ctx.message.author.roles):
-			await ctx.send(embed=discord.Embed(description="LMAO You're not even in LP! Access denied!"))
+	async def set(self, ctx, field: str, *args):
+		# todo: invalid field or args
+		# check if user has the right role
+		if not self.bot.lists_has_intersection(self.bot.LLAMA_PERMS, ctx.message.author.roles):
+			await ctx.send(embed=discord.Embed(title="Nope!", description="LMAO You're not even in LP! Access denied!"))
 			return
 
 		# if the message is sent in the right channel
-		if ctx.message.channel.id not in self.bot.BOT_WORK:
-			await ctx.send(embed=discord.Embed(description=f"Bruh what do you think <#{self.bot.VARS['channels']['LLAMA_BOT']}> is for?"))
+		if ctx.message.channel not in self.BOT_WORK:
+			await ctx.send(embed=discord.Embed(description=f"Bruh what do you think {self.LLAMA_BOT.mention} is for?"))
 			return
 
+		if not (field or args):
+			raise discord.ext.commands.errors.MissingRequiredArgument
+
+		if field not in ["uid", "weapon", "time", "server"]:
+			raise discord.ext.commands.errors.BadArgument
+
+		field = field.lower()
 		user_exists_in_firestore = self.bot.llama_firebase.exists("players", ctx.message.author.id)
 
-		# -set <uid>
-		if int(len(a1)) == 24:
+		# -set uid <uid>
+		if field == "uid":
 			if user_exists_in_firestore:
+				# todo: do you want to update it?
 				await ctx.send(embed=discord.Embed(description=f"You're already in the database. ask {', '.join([f'<@{fixer_id}>' for fixer_id in self.bot.fixer_ids])} to change it."))
 				return
 
 			original_content = "checking uid validity..."
 			msg = await ctx.send(embed=discord.Embed(description=original_content))
 			try:
-				wbscraper.player.get_player(a1)
+				wbscraper.player.get_player(args[0])  # inefficient but effective
 			except Exception:
 				await msg.edit(embed=discord.Embed(description=f"{original_content}\nuid not valid. Aborting."))
-				return
+				raise discord.ext.commands.errors.BadArgument
 
 			original_content = f"{original_content}\nuid is valid. Adding user to database..."
 			await msg.edit(embed=discord.Embed(description=original_content))
-			self.bot.llama_firebase.create("players", ctx.message.author.id, "uid", a1)
+			self.bot.llama_firebase.create("players", ctx.message.author.id, "uid", args[0])
 			await msg.edit(embed=discord.Embed(description=f"{original_content}\nnew player registered!"))
 			return
-		else:
-			a1 = a1.lower()
-			if not args:
-				raise discord.ext.commands.errors.MissingRequiredArgument
 
 		if user_exists_in_firestore:
-			if a1 in ["weapon", "time"]:
-				self.bot.llama_firebase.write("players", ctx.message.author.id, a1, " ".join(args))
+			if field in ["weapon", "time"]:
+				self.bot.llama_firebase.write("players", ctx.message.author.id, field, " ".join(args))
 				await self.bot.update_player(ctx.message.author.id)
-			elif a1 == "server":
+			elif field == "server":
 				if all(i in self.bot.WB_GAME_SERVERS for i in args):
 					self.bot.llama_firebase.write("players", ctx.message.author.id, "server", ",".join(list(dict.fromkeys(args))))  # remove duplicate
 					await self.bot.update_active()
@@ -188,12 +199,12 @@ Removes time and weapon data from the database
 	)
 	async def rm(self, ctx, a1):
 		a1 = str(a1).lower()
-		if not any(i in self.bot.LLAMA_PERMS for i in ctx.message.author.roles):
+		if not self.bot.lists_has_intersection(self.bot.LLAMA_PERMS, ctx.message.author.roles):
 			await ctx.send(embed=discord.Embed(description=f"Ew! non LP peasant! *spits at {ctx.message.author.mention}*"))
 			return
 
-		if ctx.message.channel.id not in self.bot.BOT_WORK:
-			await ctx.send(embed=discord.Embed(description=f"You're not in the right channel. Do it in <#{self.bot.VARS['channels']['LLAMA_BOT']}>"))
+		if ctx.message.channel not in self.BOT_WORK:
+			await ctx.send(embed=discord.Embed(description=f"You're not in the right channel. Do it in {self.LLAMA_BOT.mention}"))
 			return
 
 		if not self.bot.llama_firebase.exists("players", ctx.message.author.id):

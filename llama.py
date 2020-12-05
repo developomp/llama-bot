@@ -28,7 +28,6 @@ class Llama(commands.Bot):
 		self.llama_firebase: LlamaFirebase = LlamaFirebase(firebase_cred_path)
 
 		self.VARS = self.llama_firebase.read_collection("vars")
-		self.BOT_WORK = [int(self.VARS["channels"]["LLAMA_BOT"]), int(self.VARS["channels"]["ADMIN_BOT"])]
 		self.WB_GAME_SERVERS = [i for i in wbscraper.commons.class_to_value_list(wbscraper.data.Location) if type(i) == str]
 
 		self._quote_index = 0
@@ -118,6 +117,9 @@ class Llama(commands.Bot):
 	def get_role_from_vars(self, name):
 		return discord.utils.get(self.LP_SERVER.roles, id=int(self.VARS["roles"][name]))
 
+	def get_channel_from_vars(self, name):
+		return self.LP_SERVER.get_channel(int(self.VARS["channels"][name]))
+
 	# ----- [ STATIC METHODS ] -----
 	# Putting it under the bot client class so it's accessible on cog modules.
 
@@ -126,7 +128,7 @@ class Llama(commands.Bot):
 		"""
 			Checks if any of the roles in roles1 is in roles2
 		"""
-		return any(role in list1 for role in list2)
+		return any(element in list1 for element in list2)
 
 	@staticmethod
 	def url_from_str(string: str) -> list:
