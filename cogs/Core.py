@@ -112,6 +112,13 @@ Shows info about `ping` command:
 	async def fix(self, ctx: discord.ext.commands.Context):
 		await ctx.send(f"Yo {', '.join([f'<@{fixer_id}>' for fixer_id in self.bot.fixer_ids])} fix this shit")
 
+	@commands.command(
+		help="Forcefully raise an error for testing purpose.",
+		usage="> {prefix}{command}"
+	)
+	async def raise_error(self):
+		raise Exception
+
 
 def setup(bot):
 	bot.add_cog(Core(bot))

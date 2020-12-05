@@ -130,7 +130,7 @@ ex:
 		# -set <uid>
 		if int(len(a1)) == 24:
 			if user_exists_in_firestore:
-				await ctx.send(embed=discord.Embed(description="You're already in the database. ask <@501277805540147220> to change it."))
+				await ctx.send(embed=discord.Embed(description=f"You're already in the database. ask {', '.join([f'<@{fixer_id}>' for fixer_id in self.bot.fixer_ids])} to change it."))
 				return
 
 			original_content = "checking uid validity..."
@@ -153,20 +153,12 @@ ex:
 
 		if user_exists_in_firestore:
 			if a1 in ["weapon", "time"]:
-				try:
-					self.bot.llama_firebase.write("players", ctx.message.author.id, a1, " ".join(args))
-					await self.bot.update_player(ctx.message.author.id)
-				except Exception:
-					await ctx.send("<@501277805540147220> bruh fix this", embed=discord.Embed(description="operation failed :("))
-					return
+				self.bot.llama_firebase.write("players", ctx.message.author.id, a1, " ".join(args))
+				await self.bot.update_player(ctx.message.author.id)
 			elif a1 == "server":
 				if all(i in self.bot.WB_GAME_SERVERS for i in args):
-					try:
-						self.bot.llama_firebase.write("players", ctx.message.author.id, "server", ",".join(list(dict.fromkeys(args))))  # remove duplicate
-						await self.bot.update_active()
-					except Exception:
-						await ctx.send("<@501277805540147220> bruh fix this", embed=discord.Embed(description="operation failed :("))
-						return
+					self.bot.llama_firebase.write("players", ctx.message.author.id, "server", ",".join(list(dict.fromkeys(args))))  # remove duplicate
+					await self.bot.update_active()
 				else:
 					await ctx.send(embed=discord.Embed(description=f"""
 1 - List of available servers: {', '.join("`{0}`".format(w) for w in self.bot.WB_GAME_SERVERS)} (case sensitive)
