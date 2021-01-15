@@ -2,6 +2,7 @@
 import re
 import operator
 import traceback
+import cogs._util as util
 
 import discord
 from discord.ext import commands
@@ -109,7 +110,7 @@ You'll need at least one of the following roles to use this feature: {' | '.join
 
 		files = [await attachment.to_file(spoiler=attachment.is_spoiler()) for attachment in message.attachments]
 		if has_video:
-			await ctx.send("\n".join(self.bot.url_from_str(message.content)), files=files)
+			await ctx.send("\n".join(util.url_from_str(message.content)), files=files)
 		else:
 			await ctx.send(embed=new_embed, files=files)
 
@@ -131,7 +132,7 @@ You'll need at least one of the following roles to use this feature: {' | '.join
 		original_message_content = f"pinning [a message]({message.jump_url}) as requested by: {payload.member.mention}"
 		original_message = await channel.send(embed=discord.Embed(description=original_message_content))
 
-		if not self.bot.lists_has_intersection(self.bot.PIN_PERMISSIONS, payload.member.roles):
+		if not util.lists_has_intersection(self.bot.PIN_PERMISSIONS, payload.member.roles):
 			await original_message.edit(embed=discord.Embed(description=original_message_content + f"\n:exclamation: FAILED\nTo pin a message, you need at lest one of the following roles:" + ("\n-".join([role.mention for role in self.bot.PIN_PERMISSIONS]))))
 			return
 		if message.pinned:
@@ -190,7 +191,6 @@ or
 
 	@commands.command(
 		help="Shows channels with reaction pinning enabled.",
-		usage="""> {prefix}{command}"""
 	)
 	async def pinnable(self, ctx: discord.ext.commands.Context):
 		# todo: show categories

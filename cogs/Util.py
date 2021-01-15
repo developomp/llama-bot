@@ -26,7 +26,6 @@ ex:
 
 	@commands.command(
 		help="Measures communication delay(latency) in 1/1000 of a second (millisecond/ms).",
-		usage="> {prefix}{command}"
 	)
 	async def ping(self, ctx):
 		message_latency = int((datetime.now() - ctx.message.created_at).microseconds / 1000)

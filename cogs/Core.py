@@ -10,11 +10,10 @@ class Core(commands.Cog):
 
 	def __init__(self, bot):
 		self.bot = bot
-		self.bot.remove_command('help')
+		self.bot.remove_command("help")
 
 	@commands.command(
 		help="Shows very basic information about the bot.",
-		usage="> {prefix}{command}"
 	)
 	async def about(self, ctx):
 		uptime = str(timedelta(seconds=int(round(time() - self.bot.start_time))))
@@ -51,16 +50,19 @@ Shows info about `ping` command:
 		cogs = list(self.bot.cogs.keys())
 
 		if not cog_str:
-			help_embed = discord.Embed(title="Help")
-			help_embed.description = f"Use `{self.bot.command_prefix}help <cog>` command to get more information on a cog. (not case sensitive)"
-			for cog_str in cogs:
-				help_embed.add_field(name=cog_str, value=f"`{self.bot.command_prefix}help {cog_str.lower()}`")
+			help_embed = discord.Embed(
+				title="Help",
+				description=f"Use `{self.bot.command_prefix}help <cog>` command to get more information on a cog. (not case sensitive)"
+			)
+
+			# Show command to get help for a cog
+			for cog in cogs:
+				help_embed.add_field(name=cog, value=f"`{self.bot.command_prefix}help {cog.lower()}`")
 
 			# fields that will be shown in main help embed
 			for cog_name in self.bot.cogs:
 				try:
-					cog = self.bot.get_cog(cog_name)
-					for field in cog.main_help_fields:
+					for field in self.bot.get_cog(cog_name).main_help_fields:
 						help_embed.add_field(name=field[0], value=field[1], inline=False)
 				except AttributeError:
 					# cog doesn't have main_help_fields
@@ -87,6 +89,9 @@ Shows info about `ping` command:
 			else:
 				comm: discord.ext.commands.Command = discord.utils.get(self.bot.commands, name=cog_str)
 				if comm:
+					# default usage
+					if not comm.usage:
+						comm.usage = "> {prefix}{command}"
 					await ctx.send(
 						embed=discord.Embed(
 							title=f"{self.bot.command_prefix}{comm.name}",
@@ -106,17 +111,9 @@ Shows info about `ping` command:
 
 	@commands.command(
 		help="Call for help.",
-		usage="> {prefix}{command}"
 	)
 	async def fix(self, ctx: discord.ext.commands.Context):
 		await ctx.send(f"Yo {', '.join([f'<@{fixer_id}>' for fixer_id in self.bot.fixer_ids])} fix this shit")
-
-	@commands.command(
-		help="Forcefully raise an error for testing purpose.",
-		usage="> {prefix}{command}"
-	)
-	async def raise_error(self):
-		raise Exception
 
 
 def setup(bot):

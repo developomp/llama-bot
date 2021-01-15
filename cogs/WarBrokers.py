@@ -1,4 +1,5 @@
 import wbscraper.player
+import cogs._util as util
 
 import discord
 from discord.ext import commands
@@ -123,7 +124,7 @@ ex:
 	async def set(self, ctx, field: str, *args):
 		# todo: invalid field or args
 		# check if user has the right role
-		if not self.bot.lists_has_intersection(self.bot.LLAMA_PERMS, ctx.message.author.roles):
+		if not util.lists_has_intersection(self.bot.LLAMA_PERMS, ctx.message.author.roles):
 			await ctx.send(embed=discord.Embed(title="Nope!", description="LMAO You're not even in LP! Access denied!"))
 			return
 
@@ -199,7 +200,7 @@ Removes time and weapon data from the database
 	)
 	async def rm(self, ctx, a1):
 		a1 = str(a1).lower()
-		if not self.bot.lists_has_intersection(self.bot.LLAMA_PERMS, ctx.message.author.roles):
+		if not util.lists_has_intersection(self.bot.LLAMA_PERMS, ctx.message.author.roles):
 			await ctx.send(embed=discord.Embed(description=f"Ew! non LP peasant! *spits at {ctx.message.author.mention}*"))
 			return
 

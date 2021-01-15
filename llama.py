@@ -12,7 +12,6 @@ from time import time
 import traceback
 import random
 import json
-import re
 
 
 class Llama(commands.Bot):
@@ -86,7 +85,8 @@ class Llama(commands.Bot):
 			await ctx.send(embed=discord.Embed(title="Error!", description="Command Failed to complete. This is most likely a problem on the bot's side."))
 
 		if flag:
-			await ctx.send(embed=discord.Embed(description=f"If you believe this is a problem with the bot, kindly ping any one of {', '.join([f'<@{fixer_id}>' for fixer_id in self.fixer_ids])}."))
+			fixer_list = "\n-".join([f"<@{fixer_id}>" for fixer_id in self.fixer_ids])
+			await ctx.send(embed=discord.Embed(description=f"If you believe this is a problem with the bot, kindly ping any one of the following:\n-{fixer_list}"))
 
 		print("")
 		print("="*30)
@@ -119,25 +119,6 @@ class Llama(commands.Bot):
 
 	def get_channel_from_vars(self, name):
 		return self.LP_SERVER.get_channel(int(self.VARS["channels"][name]))
-
-	# ----- [ STATIC METHODS ] -----
-	# Putting it under the bot client class so it's accessible on cog modules.
-
-	@staticmethod
-	def lists_has_intersection(list1: list, list2: list):
-		"""
-			Checks if any of the roles in roles1 is in roles2
-		"""
-		return any(element in list1 for element in list2)
-
-	@staticmethod
-	def url_from_str(string: str) -> list:
-		# https://daringfireball.net/2010/07/improved_regex_for_matching_urls
-		url = re.findall(
-			r"(?i)\b((?:https?://|www\d{0,3}[.]|[a-z0-9.\-]+[.][a-z]{2,4}/)(?:[^\s()<>]+|\(([^\s()<>]+|(\([^\s()<>]+\)))*\))+(?:\(([^\s()<>]+|(\([^\s()<>]+\)))*\)|[^\s`!()\[\]{};:'\".,<>?«»“”‘’]))",
-			string
-		)
-		return [x[0] for x in url]
 
 
 def main():

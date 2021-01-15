@@ -3,3 +3,5 @@ __pycache__/
 secrets/
 config.json
 cogs/_*
+!cogs/_util.py
+_/

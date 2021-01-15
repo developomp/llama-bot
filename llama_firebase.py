@@ -23,12 +23,12 @@ class LlamaFirebase:
 		return self.db.collection(u"%s" % collection_name).document(u"%s" % document_name).get().to_dict()
 
 	def delete(self, collection_name, document_name, data_name):
-		return self.db.collection(u"%s" % collection_name).document(u"%s" % document_name).update_channel_maps({u"%s" % data_name: firestore.DELETE_FIELD})
+		return self.db.collection(u"%s" % collection_name).document(u"%s" % document_name).update({u"%s" % data_name: firestore.DELETE_FIELD})
 
 	def exists(self, collection_name, discord_id):
 		return True if self.db.collection(u"%s" % collection_name).document(u"%s" % discord_id).get().exists else False
 
-	def write(self, collection_name, document_name, data_name, data):
+	def write(self, collection_name, document_name, data_name, data, merge=True):
 		if not isinstance(data, list):
 			data = u"%s" % data
-		return self.db.collection(u"%s" % collection_name).document(u"%s" % document_name).set({u"%s" % data_name: data}, merge=True)
+		return self.db.collection(u"%s" % collection_name).document(u"%s" % document_name).set({u"%s" % data_name: data}, merge=merge)

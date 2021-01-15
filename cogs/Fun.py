@@ -12,18 +12,20 @@ class Fun(commands.Cog):
 	@commands.command(
 		aliases=["quote", ],
 		help="Shows a random llama quote.",
-		usage="> {prefix}{command}"
 	)
 	async def llama(self, ctx):
 		# the reason why I don't use random.choice is because it may give two of the same result consecutively.
 		await ctx.send(embed=discord.Embed(title="Llama quote that'll make your day", description=self.bot.quote))
 
 	@commands.command(
+		aliases=["pp", ],
 		help="""Detects user's penis length.
 This is 101% accurate.""",
 		usage="""> {prefix}{command} *<user>
 ex:
-> {prefix}{command} <@501277805540147220> <@641574882382970891>"""
+Show penis length of <@501277805540147220> and <@641574882382970891>
+> {prefix}{command} <@501277805540147220> <@641574882382970891>
+"""
 	)
 	async def penis(self, ctx, *users: discord.Member):
 		dongs = {}
@@ -39,10 +41,10 @@ ex:
 			dongs[ctx.author] = "8{}D".format("=" * random.randint(0, 30))
 
 		random.setstate(state)
-		dongs = sorted(dongs.items(), key=lambda x: x[1])
+		# dongs = sorted(dongs.items(), key=lambda x: x[1])
 
 		for user, dong in dongs:
-			msg += "**{}'s size:**\n{}\n".format(user.mention, dong)
+			msg += "**%s's size:**\n%s\n" % (user.mention, dong)
 
 		await ctx.send(msg)
 
@@ -111,8 +113,7 @@ ex:
 		)
 
 	@commands.command(
-		help="Shows you useless fact.",
-		usage="> {prefix}{command}"
+		help="Shows useless facts.",
 	)
 	async def fact(self, ctx):
 		await ctx.send(embed=discord.Embed(title="Fact of the day", description=nekos.fact()))
