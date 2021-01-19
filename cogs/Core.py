@@ -113,7 +113,7 @@ Shows info about `ping` command:
 		help="Call for help.",
 	)
 	async def fix(self, ctx: discord.ext.commands.Context):
-		await ctx.send(f"Fuck you {ctx.message.author.mention} :coronalol:")
+		await ctx.send(f"Fuck you {ctx.message.author.mention} <:coronalol:692323993419776020>")
 		# await ctx.send(f"Yo {', '.join([f'<@{fixer_id}>' for fixer_id in self.bot.fixer_ids])} fix this shit")
 
 
