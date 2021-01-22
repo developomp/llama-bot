@@ -19,7 +19,7 @@ class Fun(commands.Cog):
 
 	@commands.command(
 		aliases=["pp", ],
-		help="""Detects user's penis length.
+		help="""Detects user's penis length and arranges them from largest to smallest.
 This is 101% accurate.""",
 		usage="""> {prefix}{command} *<user>
 ex:
@@ -41,7 +41,7 @@ Show penis length of <@501277805540147220> and <@641574882382970891>
 			dongs[ctx.author] = "8{}D".format("=" * random.randint(0, 30))
 
 		random.setstate(state)
-		# dongs = sorted(dongs.items(), key=lambda x: x[1])
+		dongs = sorted(dongs.items(), key=lambda x: x[1])
 
 		for user, dong in dongs:
 			msg += "**%s's size:**\n%s\n" % (user.mention, dong)
