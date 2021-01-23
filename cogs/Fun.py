@@ -111,7 +111,7 @@ user can be a discord ID or a mention (ping)."""
 				),
 				embed=discord.Embed(
 					title="F U C K",
-					description=f"{ctx.author.mention} is fucking {victim.mention}"
+					description=f"fucking {victim.mention}"
 				)
 			)
 
