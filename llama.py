@@ -62,31 +62,27 @@ class Llama(commands.Bot):
 		print(f"{self.user} is up and ready!")
 
 	async def on_command_error(self, ctx: discord.ext.commands.Context, error: discord.ext.commands.CommandError):
-		flag = False
+		if isinstance(error, discord.ext.commands.errors.NSFWChannelRequired):
+			await ctx.send(embed=discord.Embed(title=":lock: This command is not available in non NSFW channel"))
+
 		if isinstance(error, discord.ext.commands.errors.BotMissingPermissions):
-			flag = True
 			missing_perms_list = "".join([f"- {i}\n" for i in error.missing_perms])
 			await ctx.send(embed=discord.Embed(title="Aw man", description=f"The bot require following permissions to run command `{ctx.message.content}`.\n{missing_perms_list}"))
 
 		if isinstance(error, discord.ext.commands.errors.NotOwner):
-			flag = True
 			await ctx.send(embed=discord.Embed(title="Oops!", description=f"You have to be a bot owner to run command `{ctx.message.content}`."))
 
 		if isinstance(error, discord.ext.commands.errors.MissingRequiredArgument):
-			flag = True
 			await ctx.send(embed=discord.Embed(title="Error!", description=f"Command `{ctx.message.content}` is missing required argument(s).\nConsider using `{self.command_prefix}help {ctx.command}` to learn how to use it."))
 
 		if isinstance(error, (discord.ext.commands.errors.BadArgument, discord.ext.commands.ArgumentParsingError)):
-			flag = True
 			await ctx.send(embed=discord.Embed(title="Hol up!", description=f"command `{ctx.message.content}` is given invalid argument(s).\nConsider using `{self.command_prefix}help {ctx.command}` to learn how to use it."))
 
 		if isinstance(error, discord.ext.commands.errors.CommandInvokeError):
-			flag = True
 			await ctx.send(embed=discord.Embed(title="Error!", description="Command Failed to complete. This is most likely a problem on the bot's side."))
 
-		if flag:
-			fixer_list = "\n-".join([f"<@{fixer_id}>" for fixer_id in self.fixer_ids])
-			await ctx.send(embed=discord.Embed(description=f"If you believe this is a problem with the bot, kindly ping any one of the following:\n-{fixer_list}"))
+		if isinstance(error, discord.ext.commands.errors.MemberNotFound):
+			await ctx.send(embed=discord.Embed(title="Hmm...", description=f"Member {error.argument} was not found in this server."))
 
 		print("")
 		print("="*30)

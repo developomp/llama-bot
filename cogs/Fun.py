@@ -91,6 +91,7 @@ Show penis length of <@501277805540147220> and <@641574882382970891>
 
 user can be a discord ID or a mention (ping)."""
 	)
+	@commands.is_nsfw()
 	async def fuck(self, ctx: discord.ext.commands.Context, victim: discord.Member):
 		image = self.fuck_template_image.copy()
 		image.alpha_composite(
@@ -163,8 +164,7 @@ ex:
 			return
 
 		if in_nsfw and not ctx.message.channel.is_nsfw():
-			await ctx.send(embed=discord.Embed(title=":lock: This command is not available in non NSFW channel"))
-			return
+			raise discord.ext.commands.errors.NSFWChannelRequired
 
 		image_url = nekos.img(target.lower())
 		await ctx.send(
