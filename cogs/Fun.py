@@ -1,13 +1,50 @@
-import random
+import os
 import nekos
+import random
+import os.path
+import requests
+from PIL import Image, ImageDraw
+from io import BytesIO
 
 import discord
 from discord.ext import commands
 
 
+def crop_circle(pil_img):
+	# crop center square
+	new_size = min(pil_img.size)
+	img_width, img_height = pil_img.size
+	pil_img = pil_img.crop((
+		(img_width - new_size) // 2,
+		(img_height - new_size) // 2,
+		(img_width + new_size) // 2,
+		(img_height + new_size) // 2
+	))
+
+	# create circle mask
+	mask = Image.new("L", pil_img.size, 0)
+	draw = ImageDraw.Draw(mask)
+	draw.ellipse(
+		(
+			0,
+			0,
+			pil_img.size[0],
+			pil_img.size[1]
+		),
+		fill=255
+	)
+	pil_img.putalpha(mask)
+
+	# resize and return
+	final_size = 160
+	return pil_img.resize((final_size, final_size))
+
+
 class Fun(commands.Cog):
 	def __init__(self, bot):
 		self.bot = bot
+		self.fuck_template_image: Image.Image = Image.open(os.path.abspath("res/fuck.png"))
+		self.fuck_hair_template_image: Image.Image = Image.open(os.path.abspath("res/fuck_hair.png"))
 
 	@commands.command(
 		aliases=["quote", ],
@@ -49,6 +86,35 @@ Show penis length of <@501277805540147220> and <@641574882382970891>
 		await ctx.send(msg)
 
 	@commands.command(
+		help="Shows an image of someone getting fucked",
+		usage="""> {prefix}{command} <user>
+
+user can be a discord ID or a mention (ping)."""
+	)
+	async def fuck(self, ctx: discord.ext.commands.Context, victim: discord.Member):
+		image = self.fuck_template_image.copy()
+		image.alpha_composite(
+			crop_circle(Image.open(BytesIO(requests.get(victim.avatar_url).content))),
+			(320, 170)
+		)
+		image.alpha_composite(self.fuck_hair_template_image)
+
+		with BytesIO() as img_byte_arr:
+			image.save(img_byte_arr, format="PNG", quality=100)
+			img_byte_arr.seek(0)
+
+			await ctx.send(
+				file=discord.File(
+					fp=img_byte_arr,
+					filename=f"fuck_{ctx.author.id}_{victim.id}.png"
+				),
+				embed=discord.Embed(
+					title="F U C K",
+					description=f"{ctx.author.mention} is fucking {victim.mention}"
+				)
+			)
+
+	@commands.command(
 		help="Owoifies your message. OwO",
 		usage="""> {prefix}{command} <text>
 ex:
@@ -87,8 +153,7 @@ ex:
 		in_non_nsfw = target in non_nsfw
 		if not (in_nsfw or in_non_nsfw):
 			await ctx.send(
-				embed=
-				discord.Embed(
+				embed=discord.Embed(
 					title="Oops",
 					description="Image category you're looking for doesn't exist. Here's all we got:"
 				)
@@ -103,8 +168,7 @@ ex:
 
 		image_url = nekos.img(target.lower())
 		await ctx.send(
-			embed=
-			discord.Embed(
+			embed=discord.Embed(
 				title="Image",
 				description=f"requested by: {ctx.message.author.mention}\n**[Link if you don't see the image]({image_url})**"
 			)

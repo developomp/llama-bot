@@ -24,16 +24,15 @@ ex:
 	)
 	@util.must_be_admin()
 	async def database(self, ctx, operation: str, scope: str, data: str = None):
-		available_channel_ids = [self.bot.VARS["channels"]["ADMIN_BOT"], ]
-		if ctx.message.channel.id not in available_channel_ids:  # todo: make it expandable
-			ctx.send(embed=discord.Embed(title="Oops", description=f"Admin commands can only be executed in: {', '.join([f'<#{channel_id}>' for channel_id in available_channel_ids])}>"))
+		if str(ctx.message.channel.id) not in [self.bot.VARS["channels"]["ADMIN_BOT"], ]:
+			await ctx.send(embed=discord.Embed(title="Oops", description=f"Admin commands can only be executed in: {', '.join([f'<#{channel_id}>' for channel_id in available_channel_ids])}"))
 			return
 
 		if operation in ["read", "r"]:
 			if scope in ["all", "a"]:
 				await ctx.send(
 					file=discord.File(
-						fp=StringIO((json.dumps(self.bot.llama_firebase.read_all(), indent=4))),
+						fp=StringIO(json.dumps(self.bot.llama_firebase.read_all(), indent=4)),
 						filename="discord_warbrokers_llama_firestore_all.json"
 					)
 				)
