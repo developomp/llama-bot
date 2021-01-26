@@ -10,7 +10,9 @@ import discord
 from discord.ext import commands
 
 
-def crop_circle(pil_img):
+def crop_circle(pil_img: Image.Image):
+	# I can't get transparent background to work
+
 	# crop center square
 	new_size = min(pil_img.size)
 	img_width, img_height = pil_img.size
@@ -22,14 +24,14 @@ def crop_circle(pil_img):
 	))
 
 	# create circle mask
-	mask = Image.new("L", pil_img.size, 0)
+	mask = Image.new("L", pil_img.size)
 	draw = ImageDraw.Draw(mask)
 	draw.ellipse(
 		(
 			0,
 			0,
-			pil_img.size[0],
-			pil_img.size[1]
+			pil_img.width,
+			pil_img.height
 		),
 		fill=255
 	)
@@ -71,19 +73,24 @@ Show penis length of <@501277805540147220> and <@641574882382970891>
 
 		for user in users:
 			random.seed(user.id)
-			dongs[user] = "8{}D".format("=" * random.randint(0, 30))
+			random_size = random.randint(0, 30)
+			dongs[user] = ["8{}D".format("=" * random_size), random_size]
 
 		if not users:
 			random.seed(ctx.author.id)
-			dongs[ctx.author] = "8{}D".format("=" * random.randint(0, 30))
+			random_size = random.randint(0, 30)
+			dongs[ctx.author] = ["8{}D".format("=" * random_size), random_size]
 
 		random.setstate(state)
-		dongs = sorted(dongs.items(), key=lambda x: x[1])
+		dongs = sorted(dongs.items(), key=lambda x: x[1][1])
 
 		for user, dong in dongs:
-			msg += "**%s's size:**\n%s\n" % (user.mention, dong)
+			msg += "**%s's size: ( %s )**\n%s\n" % (user.mention, dong[1], dong[0])
 
-		await ctx.send(msg)
+		await ctx.send(embed=discord.Embed(
+			title="Here's your pp list",
+			description=msg
+		))
 
 	@commands.command(
 		help="Shows an image of someone getting fucked",
