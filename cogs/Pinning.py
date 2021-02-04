@@ -117,7 +117,7 @@ You'll need at least one of the following roles to use this feature: {' | '.join
 	# reaction pinning
 	@commands.Cog.listener()
 	async def on_raw_reaction_add(self, payload: discord.RawReactionActionEvent):
-		# todo: cannot pin same message in 10s
+		# todo: per message 10s cooldown
 		if payload.emoji not in self.pin_emojis:
 			return
 
@@ -227,18 +227,31 @@ or
 		await ctx.send(embed=discord.Embed(title="Channels with reaction pinning enabled", description=description))
 
 	@commands.command(
-		help="Creates pin map from from source channel to destination channel.",
-		usage="""> {prefix}{command} <source_channel> <destination_channel>
+		help="Creates or removes pin mapping from source channel to destination channel.",
+		usage="""> {prefix}{command} <operation: create | c | destroy | d> <source_channel> <destination_channel>
 ex:
 - Using channel mentions
-> {prefix}{command} <#761546616036524063> <#764029864033779732>
+> {prefix}{command} create <#761546616036524063> <#764029864033779732>
+> {prefix}{command} destroy <#761546616036524063> <#764029864033779732>
 
 - Using channel ids
-> {prefix}{command} 761546616036524063 764029864033779732
-"""
+> {prefix}{command} create 761546616036524063 764029864033779732
+> {prefix}{command} destroy 761546616036524063 764029864033779732"""
 	)
 	@commands.has_permissions(administrator=True)
-	async def map(self, ctx: discord.ext.commands.Context, source_channel_raw: str, destination_channel_raw: str):
+	async def map(self, ctx: discord.ext.commands.Context, operation: str, source_channel_raw: str, destination_channel_raw: str):
+		op1 = ["create", "c"]
+		op2 = ["destroy", "d"]
+
+		operation_mode = 0  # 0: None, 1: Create, 2: Destroy
+
+		if operation in op1:
+			operation_mode = 1
+		if operation in op2:
+			operation_mode = 2
+		if not operation_mode:
+			raise discord.ext.commands.errors.BadArgument
+
 		try:
 			source_channel = self.bot.LP_SERVER.get_channel(int(re.findall(r'\d+', source_channel_raw)[0]))
 			destination_channel = self.bot.LP_SERVER.get_channel(int(re.findall(r'\d+', destination_channel_raw)[0]))
@@ -255,38 +268,27 @@ ex:
 			await ctx.send(embed=discord.Embed(title="Nope!", description="That destination channel doesn't exist!"))
 			return
 
-		self.channel_maps.add((source_channel, destination_channel))
-		await ctx.send(embed=discord.Embed(title="Pin map registered/updated!", description=f"{source_channel.mention} ⟶ {destination_channel.mention}"))
+		new = (source_channel, destination_channel)
+		new_map = f"{source_channel.mention} ⟶ {destination_channel.mention}"
+		if operation_mode == 1:
+			if new in self.channel_maps:
+				await ctx.send(embed=discord.Embed(title="Hmmm", description=f"map\n{new_map}\nalready exists"))
+				return
+			self.channel_maps.add(new)
+			await ctx.send(embed=discord.Embed(title="Pin map registered!", description=new_map))
+		elif operation_mode == 2:
+			if new not in self.channel_maps:
+				await ctx.send(embed=discord.Embed(title="Wait", description=f"map\n{new_map}\nalready removed"))
+				return
+			self.channel_maps.discard(new)
+			await ctx.send(embed=discord.Embed(title="Pin map removed!", description=new_map))
 		self.channel_maps_write()
 
 	@commands.command(
-		help="Removes pin map from source channel to destination channel.",
-		usage="""> {prefix}{command} <source_channel> <destination_channel>
-ex:
-- Using channel mentions
-> {prefix}{command} <#761546616036524063> <#764029864033779732>`
-
-- Using channel ids
-> {prefix}{command} 761546616036524063 764029864033779732
-"""
-	)
-	@commands.has_permissions(administrator=True)
-	async def unmap(self, ctx: discord.ext.commands.Context, source_channel_to_remove_raw: str, destination_channel_to_remove_raw: str):
-		try:
-			source_channel_to_remove = self.bot.LP_SERVER.get_channel(int(re.findall(r'\d+', source_channel_to_remove_raw)[0]))
-			destination_channel_to_remove = self.bot.LP_SERVER.get_channel(int(re.findall(r'\d+', destination_channel_to_remove_raw)[0]))
-		except (ValueError, IndexError):
-			raise discord.ext.commands.errors.BadArgument
-
-		self.channel_maps.discard((source_channel_to_remove, destination_channel_to_remove))
-		self.channel_maps_write()
-		await ctx.send(embed=discord.Embed(title="Unmapped!", description=f"Map {source_channel_to_remove.mention} ⟶ {destination_channel_to_remove.mention} was successfully removed"))
-
-	@commands.command(
-		help="Shows list of pin source and destination channels.",
-		usage="> {prefix}{command}"
+		help="Shows list of pin source and destination channels."
 	)
 	async def maps(self, ctx: discord.ext.commands.Context):
+		# todo: order channels
 		description = ""
 
 		if self.channel_maps:
