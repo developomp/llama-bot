@@ -11,7 +11,7 @@ from discord.ext import commands
 class Pinning(commands.Cog):
 	# todo: check if emoji is usable by bot
 	# todo: add/remove pin reaction emoji
-	# todo: check message2embed
+	# todo: review message2embed
 
 	def __init__(self, bot):
 		self.bot = bot
@@ -69,7 +69,7 @@ You'll need at least one of the following roles to use this feature: {' | '.join
 		for channel_id in self.bot.VARS["pinbot"]["allowed_channels"]:
 			try:
 				channel = self.bot.get_channel(int(channel_id))
-				assert channel
+				assert channel, f"channel {channel_id} does not exist in the LP server"
 				res.add(channel)
 			except (AssertionError, ValueError):
 				traceback.print_exc()
@@ -165,39 +165,44 @@ or
 	@commands.has_permissions(administrator=True)
 	async def reactionpin(self, ctx: discord.ext.commands.Context, operation: str, *raw_channels: str):
 		channels: set = set()
+
+		if not raw_channels:
+			await ctx.send(embed=discord.Embed(title="No channels were given", description="No channels were given as input. Aborting."))
+			return
+
 		for channel_str in raw_channels:
 			try:
 				channel = self.bot.LP_SERVER.get_channel(int(re.findall(r"\d+", channel_str)[0]))
 				assert channel
 				channels.add(channel)
 			except (ValueError, IndexError, AssertionError):
-				await ctx.send(embed=discord.Embed(title="Oops!", description=f"The bot wasn't able to find valid channel ID in `{channel_str}`"))
+				await ctx.send(embed=discord.Embed(title="Oops!", description=f"{channel_str} (`{channel_str}`) is not a valid channel."))
 				return
 
-		if not channels:
-			await ctx.send(embed=discord.Embed(title="No channels were given", description="No channels were given as input. Aborting."))
-			return
+		def channels_to_mentions():
+			return '\n-'.join([_channel.mention for _channel in channels])
 
 		if operation in ["enable", "e"]:
 			self.pinnable_channels.update(channels)
 			self.pinnable_channels_write()
-			await ctx.send(embed=discord.Embed(title="Enabled Reaction pinning!", description=f"People can now react in {' | '.join([channel.mention for channel in channels])} with {' | '.join(map(str, self.pin_emojis))} to pin a message!"))
+			await ctx.send(embed=discord.Embed(title="Enabled Reaction pinning!", description=f"People can now react in:\n-{channels_to_mentions()}\n with {' '.join(map(str, self.pin_emojis))} to pin a message!"))
 		elif operation in ["disable", "d"]:
 			self.pinnable_channels.difference_update(channels)
 			self.pinnable_channels_write()
-			await ctx.send(embed=discord.Embed(title="Disabled Reaction pinning!", description=f"Adding reactions to messages in {' | '.join([channel.mention for channel in channels])} wil **NOT** pin them now."))
+			await ctx.send(embed=discord.Embed(title="Disabled Reaction pinning!", description=f"Adding reactions to messages in \n-{channels_to_mentions()}\n will **NOT** pin them now."))
 		else:
 			raise discord.ext.commands.ArgumentParsingError
 
+	# not in reactionpin because it requires admin permission to run
 	@commands.command(
 		help="Shows channels with reaction pinning enabled.",
 	)
 	async def pinnable(self, ctx: discord.ext.commands.Context):
-		# todo: show categories
-		# todo: hidden channels
-		# todo: no category
+		# todo: hide channels when user doesn't have permission
+		# todo: fix channels no category not ordered properly
 
-		sorted_channels = sorted(self.pinnable_channels, key=operator.attrgetter("position"))
+		# sort in order they're arranged in discord (sort by "position" attribute)
+		sorted_channels: list[discord.abc.GuildChannel] = sorted(self.pinnable_channels, key=operator.attrgetter("position"))
 
 		description: str = ""
 		previous_channel_category_id: int = int()
