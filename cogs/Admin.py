@@ -14,7 +14,7 @@ class Admin(commands.Cog):
 
 	@commands.command(
 		aliases=["db", ],
-		help="Read/write from/to database. Incomplete",
+		help="Read/write from/to database. Incomplete.",
 		usage="""> {prefix}{command} <operation> <scope> <data>
 operation: read, r | write, w
 scope: firestore database path | all, a (all is only available for read operation)
