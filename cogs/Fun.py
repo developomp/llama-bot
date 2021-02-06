@@ -45,6 +45,11 @@ def crop_circle(pil_img: Image.Image):
 class Fun(commands.Cog):
 	def __init__(self, bot):
 		self.bot = bot
+
+		self.quotes = self.bot.VARS["settings"]["quotes"]
+		random.shuffle(self.quotes)
+		self.quote_index = 0
+
 		self.fuck_template_image: Image.Image = Image.open(os.path.abspath("res/fuck.png"))
 		self.fuck_hair_template_image: Image.Image = Image.open(os.path.abspath("res/fuck_hair.png"))
 
@@ -54,7 +59,13 @@ class Fun(commands.Cog):
 	)
 	async def llama(self, ctx):
 		# the reason why I don't use random.choice is because it may give two of the same result consecutively.
-		await ctx.send(embed=discord.Embed(title="Llama quote that'll make your day", description=self.bot.quote))
+		quote = self.bot.quotes[self.quote_index]
+		await ctx.send(embed=discord.Embed(title="Llama quote that'll make your day", description=quote))
+
+		self.quote_index += 1  # get next quote next time this command is called
+		if self.quote_index == (len(self.quotes) - 1):  # reshuffle and reset index
+			random.shuffle(self.quotes)
+			self.quote_index = 0
 
 	@commands.command(
 		aliases=["pp", ],

@@ -10,7 +10,6 @@ from os import listdir
 from os.path import isfile, join, splitext
 from time import time
 import traceback
-import random
 import json
 
 
@@ -28,10 +27,6 @@ class Llama(commands.Bot):
 
 		self.VARS = self.llama_firebase.read_collection("vars")
 		self.WB_GAME_SERVERS = [i for i in wbscraper.commons.class_to_value_list(wbscraper.data.Location) if type(i) == str]
-
-		self._quote_index = 0
-		self.quotes = self.VARS["settings"]["quotes"]
-		random.shuffle(self.quotes)
 
 		self.owner_ids: set = {501277805540147220, 396333737148678165}  # Can run owner only commands
 		self.fixer_ids: set = {501277805540147220}  # Pinged/DMed when there's an issue with the bot
@@ -54,14 +49,17 @@ class Llama(commands.Bot):
 		self.LLAMA_PERMS = [getattr(self, i) for i in self.VARS["settings"]["LLAMA_PERM"]]
 		self.PIN_PERMISSIONS = [getattr(self, i) for i in self.VARS["settings"]["PIN_PERM"]]
 
-		for extension in [f"cogs.{splitext(f)[0]}" for f in listdir("cogs") if isfile(join("cogs", f)) and not f[0] == "_"]:
-			print(f"loading cog: {extension}")
-			self.load_extension(extension)
+		# load cogs at the very last moment as some of them require data from the database
+		for cog in [f"cogs.{splitext(f)[0]}" for f in listdir("cogs") if isfile(join("cogs", f)) and not f[0] == "_"]:
+			print(f"loading cog: {cog}")
+			self.load_extension(cog)
 
 		self.start_time = time()
 		print(f"{self.user} is up and ready!")
 
 	async def on_command_error(self, ctx: discord.ext.commands.Context, error: discord.ext.commands.CommandError):
+		"""Gets executed when the bot encounters an error.
+		"""
 		if isinstance(error, discord.ext.commands.errors.NSFWChannelRequired):
 			await ctx.send(embed=discord.Embed(title=":lock: This command is not available in non NSFW channel"))
 
@@ -96,17 +94,6 @@ class Llama(commands.Bot):
 		traceback.print_exception(type(error), error, error.__traceback__)
 		print("="*30)
 		print("")
-
-	# ----- [ PROPERTIES ] -----
-
-	@property
-	def quote(self):
-		res = self.quotes[self._quote_index]
-		self._quote_index += 1
-		if self._quote_index == (len(self.quotes) - 1):
-			self._quote_index = 0
-			random.shuffle(self.quotes)
-		return res
 
 	# ----- [ BOT METHODS ] -----
 
