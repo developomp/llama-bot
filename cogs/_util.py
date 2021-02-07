@@ -1,3 +1,4 @@
+# I'm aware that I can use @commands.bot_has_permissions. It's a choice.
 import re
 
 import discord
@@ -5,11 +6,8 @@ from discord.ext import commands
 
 
 def must_be_admin():
-	"""
-		Discord bot command decorator.
-		Put it under @discord.ext.commands.command()
-
-		I'm aware that I can use @commands.bot_has_permissions. It's a choice.
+	"""Discord bot command decorator.
+	Put it under @discord.ext.commands.command()
 	"""
 
 	async def predicate(ctx: discord.ext.commands.Context):
