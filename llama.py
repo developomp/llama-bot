@@ -151,8 +151,11 @@ def main():
 		config = json.loads(f.read())
 
 		# I know it's a hacky solution lmao
-		if config["beta"]:
-			bot_prefix = f"b{bot_prefix}"
+		try:
+			if config["beta"]:
+				bot_prefix = f"b{bot_prefix}"
+		except KeyError:
+			pass
 
 	# not using os.environ because it's feels like a hacky solution enough for my liking
 	# Allows comments and trailing newline for TOKEN file
