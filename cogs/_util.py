@@ -20,8 +20,7 @@ def must_be_admin():
 
 
 def lists_has_intersection(list1: list, list2: list) -> bool:
-	"""
-		Checks if any of the roles in roles1 is in roles2
+	"""Checks if any of the roles in roles1 is in roles2
 	"""
 	return any(element in list1 for element in list2)
 
