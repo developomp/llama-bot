@@ -1,5 +1,6 @@
 # Original code from: https://github.com/aurzen/pinbot
 import re
+import datetime
 import operator
 import traceback
 import cogs._util as util
@@ -117,14 +118,12 @@ You'll need at least one of the following roles to use this feature: {' | '.join
 	# reaction pinning
 	@commands.Cog.listener()
 	async def on_raw_reaction_add(self, payload: discord.RawReactionActionEvent):
-		# todo: per message 10s cooldown
+		# todo: 10s cooldown per message
 		if payload.emoji not in self.pin_emojis:
 			return
 
 		channel: discord.abc.Messageable = self.bot.get_channel(payload.channel_id)
 		message: discord.Message = await channel.fetch_message(payload.message_id)
-		assert channel
-		assert message
 
 		if channel not in self.pinnable_channels:
 			return
@@ -132,6 +131,7 @@ You'll need at least one of the following roles to use this feature: {' | '.join
 		original_message_content = f"pinning [a message]({message.jump_url}) as requested by: {payload.member.mention}"
 		original_message = await channel.send(embed=discord.Embed(description=original_message_content))
 
+		# if the user has any role with pinning permission
 		if not util.lists_has_intersection(self.bot.PIN_PERMISSIONS, payload.member.roles):
 			await original_message.edit(embed=discord.Embed(description=original_message_content + f"\n:exclamation: FAILED\nTo pin a message, you need at lest one of the following roles:" + ("\n-".join([role.mention for role in self.bot.PIN_PERMISSIONS]))))
 			return
@@ -146,6 +146,11 @@ You'll need at least one of the following roles to use this feature: {' | '.join
 			return
 
 		await original_message.edit(embed=discord.Embed(description=original_message_content + "\nsuccess!"))
+
+	# pin archiving
+	@commands.Cog.listener()
+	async def on_guild_channel_pins_update(self, channel: discord.abc.GuildChannel, last_pin: datetime.datetime):
+		print(channel, last_pin)
 
 	@commands.command(
 		aliases=["rp", ],
