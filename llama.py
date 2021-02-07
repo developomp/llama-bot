@@ -105,25 +105,29 @@ class Llama(commands.Bot):
 
 
 def main():
+	bot_prefix = "-"
+
+	if not isfile("config.json"):
+		print("create config.json first!")
+		exit(-9999)
+
+	with open("config.json", "rt") as f:
+		config = json.loads(f.read())
+
+		# I know it's a hacky solution lmao
+		if config["beta"]:
+			bot_prefix = f"b{bot_prefix}"
+
 	# not using os.environ because it's feels like a hacky solution enough for my liking
 	# Allows comments and trailing newline for TOKEN file
-	with open("secrets/TOKEN", "rt") as f:
+	with open(config["token"], "rt") as f:
 		while True:
 			token = f.readline().strip()
 			if not token.startswith("#"):
 				break
 
-	bot_prefix = "-"
-
-	# I know it's a hacky solution but it's a temporary one at least
-	if isfile("config.json"):  # don't change command prefix if there's no config file
-		with open("config.json", "rt") as f:
-			config = json.loads(f.read())
-			if config["beta"]:
-				bot_prefix = f"b{bot_prefix}"
-
 	llama_bot = Llama(
-		"secrets/discord-warbrokers-llama-firebase-adminsdk.json",
+		config["firestore"],
 		bot_prefix
 	)
 
