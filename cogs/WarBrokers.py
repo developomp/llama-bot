@@ -1,4 +1,6 @@
 import wbscraper.player
+import wbscraper.commons
+import wbscraper.data
 import cogs._util as util
 
 import discord
@@ -13,6 +15,9 @@ class WarBrokers(commands.Cog):
 		self.LLAMA_BOT = self.bot.get_channel_from_vars("LLAMA_BOT")
 		self.ADMIN_BOT = self.bot.get_channel_from_vars("ADMIN_BOT")
 		self.BOT_WORK = [self.LLAMA_BOT, self.ADMIN_BOT]
+
+		# list of string values of WB servers (ASIA, USA, etc.)
+		self.WB_GAME_SERVERS: list[str] = [i for i in wbscraper.commons.class_to_value_list(wbscraper.data.Location) if type(i) == str]
 
 		self.help_msg = "<#475048014604402708> and <#693401827710074931> automatically updates when the contents of the database is changed."
 
@@ -64,7 +69,7 @@ class WarBrokers(commands.Cog):
 		players = self.bot.llama_firebase.read_collection("players")
 
 		description = ""
-		for game_server in self.bot.WB_GAME_SERVERS:
+		for game_server in self.WB_GAME_SERVERS:
 			description += f"{game_server}:\n"
 			region_is_empty = True
 			for player in players:
@@ -168,12 +173,12 @@ ex:
 				self.bot.llama_firebase.write("players", ctx.message.author.id, field, " ".join(args))
 				await self.bot.update_player(ctx.message.author.id)
 			elif field == "server":
-				if all(i in self.bot.WB_GAME_SERVERS for i in args):
+				if all(i in self.WB_GAME_SERVERS for i in args):
 					self.bot.llama_firebase.write("players", ctx.message.author.id, "server", ",".join(list(dict.fromkeys(args))))  # remove duplicate
 					await self.bot.update_active()
 				else:
 					await ctx.send(embed=discord.Embed(description=f"""
-1 - List of available servers: {', '.join("`{0}`".format(w) for w in self.bot.WB_GAME_SERVERS)} (case sensitive)
+1 - List of available servers: {', '.join("`{0}`".format(w) for w in self.WB_GAME_SERVERS)} (case sensitive)
 2 - servers should be separated with spaces (not commas)
 3 - you can choose multiple servers
 
