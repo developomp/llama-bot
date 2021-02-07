@@ -16,6 +16,8 @@ class Core(commands.Cog):
 		help="Shows very basic information about the bot.",
 	)
 	async def about(self, ctx):
+		# todo: current git commit hash
+		# todo: show x versions behind
 		uptime = str(timedelta(seconds=int(round(time() - self.bot.start_time))))
 		bot_created_time = datetime.utcfromtimestamp(((int(self.bot.user.id) >> 22) + 1420070400000) / 1000)
 		bot_created_delta = datetime.now() - bot_created_time
