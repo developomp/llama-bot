@@ -3,6 +3,8 @@
 
 > **WARNING: THIS REPOSITORY CONTAINS NSFW CONTENT**
 
+![example](example.png)
+
 - Discord bot made for [one specific server](https://dsc.gg/llama). It most likely will not function properly on other discord servers.
 - Invitation of this bot to other server is blocked. You'll have to host the bot yourself if you want it on your discord server.
 - It's not designed with ease of use for others in mind. This is a personal project, so you'll have to figure things out on your own. Documentations will not be provided.
