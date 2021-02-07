@@ -1,7 +1,5 @@
-import wbscraper.commons
-import wbscraper.data
-
 from llama_firebase import LlamaFirebase
+import cogs._util as util
 
 import discord
 from discord.ext import commands
@@ -18,34 +16,48 @@ class Llama(commands.Bot):
 
 	def __init__(self, firebase_cred_path: str, prefix: str = "-"):
 		super().__init__(
-			help_command=None,
+			help_command=None,  # overwrite with custom help command
 			command_prefix=prefix,
 			case_insensitive=False
 		)
 
+		# my own firestore interface
 		self.llama_firebase: LlamaFirebase = LlamaFirebase(firebase_cred_path)
 
+		# read all variables in the beginning to save time later
 		self.VARS = self.llama_firebase.read_collection("vars")
-		self.WB_GAME_SERVERS = [i for i in wbscraper.commons.class_to_value_list(wbscraper.data.Location) if type(i) == str]
 
-		self.owner_ids: set = {501277805540147220, 396333737148678165}  # Can run owner only commands
+		self.owner_ids: set = {501277805540147220, 396333737148678165}  # IDs of users who can run owners only commands
 		self.fixer_ids: set = {501277805540147220}  # Pinged/DMed when there's an issue with the bot
 
 	# ----- [ DISCORD.PY STUFF ] -----
 
 	async def on_ready(self):
+		"""https://discordpy.readthedocs.io/en/latest/api.html#discord.on_ready
+		Called when the client is done preparing the data received from Discord.
+		Usually after login is successful and the Client.guilds and co. are filled up.
+
+		**WARNING**:
+		This function is not guaranteed to be the first event called.
+		Likewise, this function is not guaranteed to only be called once.
+		Discord.py implements reconnection logic and thus will end up calling this event whenever a RESUME request fails.
+		"""
+
+		# Prevents bot from running in server other than LP's
 		self.LP_SERVER: discord.Guild = next((guild for guild in self.guilds if guild.id == 457373827073048604), None)
 		if not self.LP_SERVER:
 			print("----------[ The bot is not in LP server! ]----------")
 			exit(-6969)
 
 		# todo: don't load roles until when necessary
+		# load roles
 		self.HIGHEST_ORDER = self.get_role_from_vars("HIGHEST_ORDER")
 		self.PYJAMAS = self.get_role_from_vars("PYJAMAS")
 		self.THE_LLAMA = self.get_role_from_vars("THE_LLAMA")
 		self.SILK_PERMISSION = self.get_role_from_vars("SILK_PERMISSION")
 		self.HOMIES = self.get_role_from_vars("HOMIES")
 
+		# define roles with access special features
 		self.LLAMA_PERMS = [getattr(self, i) for i in self.VARS["settings"]["LLAMA_PERM"]]
 		self.PIN_PERMISSIONS = [getattr(self, i) for i in self.VARS["settings"]["PIN_PERM"]]
 
@@ -54,40 +66,60 @@ class Llama(commands.Bot):
 			print(f"loading cog: {cog}")
 			self.load_extension(cog)
 
+		# to show bot uptime
 		self.start_time = time()
 		print(f"{self.user} is up and ready!")
 
 	async def on_command_error(self, ctx: discord.ext.commands.Context, error: discord.ext.commands.CommandError):
+		# todo: pass message with exception
 		"""Gets executed when the bot encounters an error.
 		"""
+
+		error_message = str(error)
+
+		# When command that is only meant to be called in admin channels are called elsewhere
+		if isinstance(error, util.NotAdminChannel):
+			await ctx.send(embed=discord.Embed(
+				title="<:hinkies:766672386132934666> Not in admin channel!",
+				description=error_message
+			))
+
+		# When NSFW commands are called in non NSFW channels
 		if isinstance(error, discord.ext.commands.errors.NSFWChannelRequired):
 			await ctx.send(embed=discord.Embed(title=":lock: This command is not available in non NSFW channel"))
 
+		# When the bot doesn't have permissions it requires to run a command
 		if isinstance(error, discord.ext.commands.errors.BotMissingPermissions):
 			missing_perms_list = "".join([f"- {i}\n" for i in error.missing_perms])
 			await ctx.send(embed=discord.Embed(title="Aw man", description=f"The bot require following permissions to run command `{ctx.message.content}`.\n{missing_perms_list}"))
 
+		# When a command that can only be called by the owners are called
 		if isinstance(error, discord.ext.commands.errors.NotOwner):
 			await ctx.send(embed=discord.Embed(title="Oops!", description=f"You have to be a bot owner to run command `{ctx.message.content}`."))
 
+		# When argument(s) required by the command is not passed
 		if isinstance(error, discord.ext.commands.errors.MissingRequiredArgument):
 			await ctx.send(embed=discord.Embed(title="Error!", description=f"Command `{ctx.message.content}` is missing required argument(s).\nConsider using `{self.command_prefix}help {ctx.command}` to learn how to use it."))
 
+		# When invalid argument is passed
 		if isinstance(error, (discord.ext.commands.errors.BadArgument, discord.ext.commands.ArgumentParsingError)):
 			await ctx.send(embed=discord.Embed(title="Hol up!", description=f"command `{ctx.message.content}` is given invalid argument(s).\nConsider using `{self.command_prefix}help {ctx.command}` to learn how to use it."))
 
-		if isinstance(error, discord.ext.commands.errors.CommandInvokeError):
-			await ctx.send(embed=discord.Embed(title="Error!", description="Command Failed to complete. This is most likely a problem on the bot's side."))
-
+		# When user id doesn't correspond to anyone in the server
 		if isinstance(error, discord.ext.commands.errors.MemberNotFound):
 			await ctx.send(embed=discord.Embed(title="Hmm...", description=f"Member {error.argument} was not found in this server."))
 
+		# When command failed to complete
+		if isinstance(error, discord.ext.commands.errors.CommandInvokeError):
+			await ctx.send(embed=discord.Embed(title="Error!", description="Command Failed to complete. This is most likely a problem on the bot's side."))
+
+		# Log details in terminal
 		print("")
 		print("="*30)
 		print(type(error))
 		print("Cog:", ctx.cog)
 		print("Author:", ctx.author, ctx.author.id)
-		print("Content:", ctx.message.content)
+		print("Content:", ctx.message.content)  # show message that actually caused the error
 		print("Channel:", ctx.message.channel, ctx.message.channel.id)
 		print("URL:", ctx.message.jump_url)
 		print("")
@@ -98,9 +130,13 @@ class Llama(commands.Bot):
 	# ----- [ BOT METHODS ] -----
 
 	def get_role_from_vars(self, name):
+		"""Get discord role by name
+		"""
 		return discord.utils.get(self.LP_SERVER.roles, id=int(self.VARS["roles"][name]))
 
 	def get_channel_from_vars(self, name):
+		"""Get discord channel by name
+		"""
 		return self.LP_SERVER.get_channel(int(self.VARS["channels"][name]))
 
 
