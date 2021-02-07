@@ -41,8 +41,8 @@
 
 More info:
    - https://firebase.google.com/docs/admin/setup#initialize-sdk
-   - https://discord.com/developers/docs/intro
-   - https://discordpy.readthedocs.io
+   - https://discordpy.readthedocs.io/en/latest/quickstart.html
+   - https://discord.com/developers/docs
 
 # Contacting
 Feel free:
