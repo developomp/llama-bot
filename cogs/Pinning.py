@@ -141,8 +141,17 @@ You'll need at least one of the following roles to use this feature: {' | '.join
 
 		try:
 			await message.pin()
-		except Exception:
-			await original_message.edit(embed=discord.Embed(description=original_message_content + "\n:exclamation: FAILED (check bot permission) :exclamation:"))
+		except Exception as err:
+			err_type = type(err)
+			why_fail = "Unknown reason"
+			if err_type == discord.Forbidden:
+				why_fail = "Bot does not have permission"
+			elif err_type == discord.NotFound:
+				why_fail = "message not found"
+			elif err_type == discord.HTTPException:
+				# channel as more then 50 pins, message is a system message, etc.
+				pass
+			await original_message.edit(embed=discord.Embed(description=original_message_content + f"\n:exclamation: FAILED ({why_fail}) :exclamation:"))
 			return
 
 		await original_message.edit(embed=discord.Embed(description=original_message_content + "\nsuccess!"))
