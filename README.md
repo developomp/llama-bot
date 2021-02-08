@@ -47,7 +47,7 @@ More info:
 # Contacting
 Feel free:
 - To submit an issue in the [github issue page](https://github.com/developomp/discord-warbrokers-llama/issues)
-- To DM me in [discord](https://discord.com) (developomp#4447)
+- To DM me in [discord](https://discord.com) (developomp#0001)
 - To send an email (developomp@gmail.com)
 
 Any feedback is welcomed.
