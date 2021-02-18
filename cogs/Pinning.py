@@ -13,6 +13,7 @@ class Pinning(commands.Cog):
 	# todo: check if emoji is usable by bot
 	# todo: add/remove pin reaction emoji
 	# todo: review message2embed
+	# todo: video pinning
 
 	def __init__(self, bot):
 		self.bot = bot

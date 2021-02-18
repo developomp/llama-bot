@@ -13,6 +13,11 @@ import json
 
 class Llama(commands.Bot):
 	# todo: less firestore calls (cache locally?)
+	# todo: emojis in feedback message to make things more intuitive
+	# todo: message on new Homie
+	# todo: save role one leave and rejoin
+	# todo: replace Dyno and carl
+	# todo: llama bot website
 
 	def __init__(self, firebase_cred_path: str, prefix: str = "-"):
 		super().__init__(

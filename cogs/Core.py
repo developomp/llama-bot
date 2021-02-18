@@ -7,6 +7,8 @@ from discord.ext import commands
 
 class Core(commands.Cog):
 	# todo: most recently executed command per user (last)
+	# todo: voting/poll (only admins can do it in restricted channels)
+	# todo: last command
 
 	def __init__(self, bot):
 		self.bot = bot

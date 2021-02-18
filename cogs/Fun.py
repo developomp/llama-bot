@@ -43,6 +43,13 @@ def crop_circle(pil_img: Image.Image):
 
 
 class Fun(commands.Cog):
+	# todo: cum command
+	# 	https://discord.com/channels/457373827073048604/764013857634516992/801661523721977866
+	# todo: touch command
+	# 	https://discord.com/channels/457373827073048604/764013857634516992/783877444549345302
+	# 	https://discord.com/channels/457373827073048604/764013857634516992/783877453855588423
+	# todo: gang <cri> <njoi>* command
+
 	def __init__(self, bot):
 		self.bot = bot
 
@@ -111,6 +118,10 @@ user can be a discord ID or a mention (ping)."""
 	)
 	@commands.is_nsfw()
 	async def fuck(self, ctx: discord.ext.commands.Context, victim: discord.Member):
+		# todo: says fuck you <user mention>
+		# todo: furry image for furry role
+		# 	https://discord.com/channels/457373827073048604/764013857634516992/783869713737711666
+		# 	https://discord.com/channels/457373827073048604/764013857634516992/783877435758215169
 		image = self.fuck_template_image.copy()
 		image.alpha_composite(
 			crop_circle(Image.open(BytesIO(requests.get(victim.avatar_url).content))),
