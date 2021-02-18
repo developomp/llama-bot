@@ -52,12 +52,11 @@ class Llama(commands.Bot):
 		# todo: don't load roles until when necessary
 		# load roles
 		self.HIGHEST_ORDER = self.get_role_from_vars("HIGHEST_ORDER")
-		self.PYJAMAS = self.get_role_from_vars("PYJAMAS")
-		self.THE_LLAMA = self.get_role_from_vars("THE_LLAMA")
+		self.LPWB_MEMBER = self.get_role_from_vars("LPWB_MEMBER")
 		self.SILK_PERMISSION = self.get_role_from_vars("SILK_PERMISSION")
-		self.HOMIES = self.get_role_from_vars("HOMIES")
+		self.PYJAMAS = self.get_role_from_vars("PYJAMAS")
 
-		# define roles with access special features
+		# define roles with access to special features
 		self.LLAMA_PERMS = [getattr(self, i) for i in self.VARS["settings"]["LLAMA_PERM"]]
 		self.PIN_PERMISSIONS = [getattr(self, i) for i in self.VARS["settings"]["PIN_PERM"]]
 
@@ -71,9 +70,10 @@ class Llama(commands.Bot):
 		print(f"{self.user} is up and ready!")
 
 	async def on_command_error(self, ctx: discord.ext.commands.Context, error: discord.ext.commands.CommandError):
-		# todo: pass message with exception
 		"""Gets executed when the bot encounters an error.
 		"""
+		# todo: pass message with exception
+		# todo: Error((title, description),) thingy
 
 		error_message = str(error)
 
@@ -134,7 +134,7 @@ class Llama(commands.Bot):
 		"""
 		return discord.utils.get(self.LP_SERVER.roles, id=int(self.VARS["roles"][name]))
 
-	def get_channel_from_vars(self, name):
+	def get_channel_from_vars(self, name) -> discord.abc.GuildChannel:
 		"""Get discord channel by name
 		"""
 		return self.LP_SERVER.get_channel(int(self.VARS["channels"][name]))

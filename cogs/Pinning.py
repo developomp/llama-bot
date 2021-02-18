@@ -119,6 +119,7 @@ You'll need at least one of the following roles to use this feature: {' | '.join
 	@commands.Cog.listener()
 	async def on_raw_reaction_add(self, payload: discord.RawReactionActionEvent):
 		# todo: 10s cooldown per message
+		# todo: if message pinning is a system message
 		if payload.emoji not in self.pin_emojis:
 			return
 
@@ -176,7 +177,7 @@ or
 or
 > {prefix}{command} d <#761546616036524063> <#764367748125949952>"""
 	)
-	@commands.has_permissions(administrator=True)
+	@util.must_be_admin()
 	async def reactionpin(self, ctx: discord.ext.commands.Context, operation: str, *raw_channels: str):
 		channels: set = set()
 
@@ -252,7 +253,7 @@ ex:
 > {prefix}{command} create 761546616036524063 764029864033779732
 > {prefix}{command} destroy 761546616036524063 764029864033779732"""
 	)
-	@commands.has_permissions(administrator=True)
+	@util.must_be_admin()
 	async def map(self, ctx: discord.ext.commands.Context, operation: str, source_channel_raw: str, destination_channel_raw: str):
 		op1 = ["create", "c"]
 		op2 = ["destroy", "d"]

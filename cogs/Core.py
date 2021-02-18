@@ -49,6 +49,8 @@ Shows info about `ping` command:
 > {prefix}{command} ping"""
 	)
 	async def help(self, ctx, cog_str=None):
+		# todo: show some things only in allowed channels
+
 		cogs = list(self.bot.cogs.keys())
 
 		if not cog_str:
@@ -116,6 +118,8 @@ Shows info about `ping` command:
 	)
 	async def fix(self, ctx: discord.ext.commands.Context):
 		await ctx.send(f"Fuck you {ctx.message.author.mention} <:coronalol:692323993419776020>")
+
+		# removed due to excessive pinging
 		# await ctx.send(f"Yo {', '.join([f'<@{fixer_id}>' for fixer_id in self.bot.fixer_ids])} fix this shit")
 
 

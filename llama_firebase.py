@@ -3,6 +3,8 @@ from firebase_admin import credentials, firestore
 
 
 class LlamaFirebase:
+	# https://firebase.google.com/docs/firestore
+
 	def __init__(self, certificate_path):
 		# Document -> google.cloud.firestore_v1.document
 

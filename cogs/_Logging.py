@@ -1,11 +1,13 @@
 import datetime
-import asyncio
 
 import discord
 from discord.ext import commands
 
 
 class Logging(commands.Cog):
+	# todo: better message deletion and edit logging (for #public-shaming)
+	# todo: highlight content difference for deleted and edited messages
+
 	def __init__(self, bot):
 		self.bot = bot
 
