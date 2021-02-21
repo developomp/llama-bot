@@ -135,7 +135,7 @@ You'll need at least one of the following roles to use this feature: {' | '.join
 
 		# if the user has any role with pinning permission
 		if not util.lists_has_intersection(self.bot.PIN_PERMISSIONS, payload.member.roles):
-			await original_message.edit(embed=discord.Embed(description=original_message_content + f"\n:exclamation: FAILED\nTo pin a message, you need at lest one of the following roles:" + ("\n-".join([role.mention for role in self.bot.PIN_PERMISSIONS]))))
+			await original_message.edit(embed=discord.Embed(description=original_message_content + f"\n:exclamation: FAILED\nTo pin a message, you need at lest one of the following roles:\n-" + ("\n-".join([role.mention for role in self.bot.PIN_PERMISSIONS]))))
 			return
 		if message.pinned:
 			await original_message.edit(embed=discord.Embed(description=original_message_content + "\n:pushpin: Already pinned!"))
