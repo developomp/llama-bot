@@ -70,7 +70,7 @@ class Fun(commands.Cog):
 		await ctx.send(embed=discord.Embed(title="Llama quote that'll make your day", description=quote))
 
 		self.quote_index += 1  # get next quote next time this command is called
-		if self.quote_index == (len(self.quotes) - 1):  # reshuffle and reset index
+		if self.quote_index > (len(self.quotes) - 1):  # reshuffle and reset index
 			random.shuffle(self.quotes)
 			self.quote_index = 0
 
