@@ -14,6 +14,7 @@ class Pinning(commands.Cog):
 	# todo: add/remove pin reaction emoji
 	# todo: review message2embed
 	# todo: video pinning
+	# todo: add/remove roles/members that can pin messages
 
 	def __init__(self, bot):
 		self.bot = bot

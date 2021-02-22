@@ -66,7 +66,7 @@ class Fun(commands.Cog):
 	)
 	async def llama(self, ctx):
 		# the reason why I don't use random.choice is because it may give two of the same result consecutively.
-		quote = self.bot.quotes[self.quote_index]
+		quote = self.quotes[self.quote_index]
 		await ctx.send(embed=discord.Embed(title="Llama quote that'll make your day", description=quote))
 
 		self.quote_index += 1  # get next quote next time this command is called
