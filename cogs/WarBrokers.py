@@ -21,8 +21,8 @@ class WarBrokers(commands.Cog):
 
 		self.help_msg = f"<#{self.bot.VARS['channels']['LLAMAS_AND_PYJAMAS_INFO']}> and <#{self.bot.VARS['channels']['ACTIVE']}> automatically updates when the contents of the database is changed."
 
-		self.active_roster_channel = self.bot.LP_SERVER.get_channel(self.bot.VARS["channels"]["ACTIVE"])
-		self.lp_info_channel = self.bot.LP_SERVER.get_channel(self.bot.VARS["channels"]["LLAMAS_AND_PYJAMAS_INFO"])
+		self.active_roster_channel = self.bot.LP_SERVER.get_channel(int(self.bot.VARS["channels"]["ACTIVE"]))
+		self.lp_info_channel = self.bot.LP_SERVER.get_channel(int(self.bot.VARS["channels"]["LLAMAS_AND_PYJAMAS_INFO"]))
 
 	async def update_player(self, user_id: int):
 		"""Update LP member list message
@@ -32,7 +32,7 @@ class WarBrokers(commands.Cog):
 		stat_page_url = wbscraper.URL.join(wbscraper.URL.stat_root, "players/i", player["uid"])
 		player_wb = wbscraper.player.get_player(stat_page_url)
 
-		player_description = f"User: {self.bot.LP_SERVER.get_member(user_id).mention}\n"
+		player_description = f"User: {(await self.bot.LP_SERVER.fetch_member(user_id)).mention}\n"
 
 		try:
 			player_description += "Preferred Weapon: %s\n" % player["weapon"]
