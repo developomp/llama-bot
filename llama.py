@@ -18,6 +18,7 @@ class Llama(commands.Bot):
 	# todo: save role one leave and rejoin
 	# todo: replace Dyno and carl
 	# todo: llama bot website
+	# todo: slash command
 
 	def __init__(self, firebase_cred_path: str, prefix: str = "-"):
 		super().__init__(

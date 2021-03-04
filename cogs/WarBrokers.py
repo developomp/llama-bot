@@ -171,12 +171,12 @@ ex:
 
 			if field in ["weapon", "time"]:
 				self.bot.llama_firebase.write("players", ctx.message.author.id, field, " ".join(args))
-				await self.bot.update_player(ctx.message.author.id)
+				await self.update_player(ctx.message.author.id)
 				updated_player_list = True
 			elif field == "server":
 				if all(i in self.WB_GAME_SERVERS for i in args):  # if all the inputs is a valid server
 					self.bot.llama_firebase.write("players", ctx.message.author.id, "server", ",".join(list(dict.fromkeys(args))))  # Not doing join(args) to remove duplicate inputs
-					await self.bot.update_active()
+					await self.update_active()
 					updated_active = True
 				else:
 					err_message = f"""
