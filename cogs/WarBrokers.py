@@ -24,9 +24,10 @@ class WarBrokers(commands.Cog):
 		self.active_roster_channel = self.bot.LP_SERVER.get_channel(self.bot.VARS["channels"]["ACTIVE"])
 		self.lp_info_channel = self.bot.LP_SERVER.get_channel(self.bot.VARS["channels"]["LLAMAS_AND_PYJAMAS_INFO"])
 
-	async def update_player(self, user_id):
+	async def update_player(self, user_id: int):
 		"""Update LP member list message
 		"""
+		user_id = int(user_id)
 		player = self.bot.llama_firebase.read("players", user_id)
 		stat_page_url = wbscraper.URL.join(wbscraper.URL.stat_root, "players/i", player["uid"])
 		player_wb = wbscraper.player.get_player(stat_page_url)
