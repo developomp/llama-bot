@@ -16,7 +16,7 @@
 > assumes you already know how to use firebase, python, and discord bots
 
 1. Clone this repo
-   - `git clone --depth 1 https://github.com/developomp/discord-warbrokers-llama.git` to save space
+   - `git clone --depth 1 https://github.com/developomp/llama-bot.git` to save space
 2. create `secrets` directory
 3. Create a new discord bot
    - https://discord.com/developers/applications
