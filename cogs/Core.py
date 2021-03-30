@@ -29,10 +29,7 @@ class Core(commands.Cog):
         bot_created_delta = datetime.now() - bot_created_time
 
         await ctx.send(
-            embed=discord.Embed(
-                title="About",
-                description="A bot created by <@501277805540147220> for LP",
-            )
+            embed=discord.Embed(title="About llama bot")
             .set_thumbnail(url=self.bot.user.avatar_url)
             .add_field(name="Bot ID", value=f"{self.bot.user.id}")
             .add_field(
@@ -41,7 +38,7 @@ class Core(commands.Cog):
             )
             .add_field(
                 name="Source Code",
-                value="https://github.com/developomp/discord-warbrokers-llama",
+                value="https://github.com/developomp/llama-bot",
                 inline=False,
             )
             .add_field(name="Uptime", value=uptime, inline=False)
