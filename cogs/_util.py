@@ -1,4 +1,5 @@
 # I'm aware that I can use @commands.bot_has_permissions. It's a choice.
+from datetime import datetime
 import re
 
 import discord
@@ -6,35 +7,42 @@ from discord.ext import commands
 
 
 class NotAdminChannel(discord.ext.commands.errors.CheckFailure):
-	pass
+    pass
 
 
 def must_be_admin():
-	"""Discord bot command decorator.
-	Put it under @discord.ext.commands.command()
-	"""
+    """Discord bot command decorator.
+    Put it under @discord.ext.commands.command()
+    """
 
-	async def predicate(ctx: discord.ext.commands.Context):
-		if ctx.message.author.guild_permissions.administrator:
-			return True
-		await ctx.send(embed=discord.Embed(description=f"You need to be a server administrator to issue the command. Aborting."))
-		return False
+    async def predicate(ctx: discord.ext.commands.Context):
+        if ctx.message.author.guild_permissions.administrator:
+            return True
+        await ctx.send(
+            embed=discord.Embed(
+                description=f"You need to be a server administrator to issue the command. Aborting."
+            )
+        )
+        return False
 
-	return commands.check(predicate)
+    return commands.check(predicate)
 
 
 def lists_has_intersection(list1: list, list2: list) -> bool:
-	"""Checks if any of the roles in roles1 is in roles2
-	"""
-	return any(element in list1 for element in list2)
+    """Checks if any of the roles in roles1 is in roles2"""
+    return any(element in list1 for element in list2)
 
 
 def url_from_str(string: str) -> list:
-	"""Extract urls from string
-	https://daringfireball.net/2010/07/improved_regex_for_matching_urls
-	"""
-	url = re.findall(
-		r"(?i)\b((?:https?://|www\d{0,3}[.]|[a-z0-9.\-]+[.][a-z]{2,4}/)(?:[^\s()<>]+|\(([^\s()<>]+|(\([^\s()<>]+\)))*\))+(?:\(([^\s()<>]+|(\([^\s()<>]+\)))*\)|[^\s`!()\[\]{};:'\".,<>?«»“”‘’]))",
-		string
-	)
-	return [x[0] for x in url]
+    """Extract urls from string
+    https://daringfireball.net/2010/07/improved_regex_for_matching_urls
+    """
+    url = re.findall(
+        r"(?i)\b((?:https?://|www\d{0,3}[.]|[a-z0-9.\-]+[.][a-z]{2,4}/)(?:[^\s()<>]+|\(([^\s()<>]+|(\([^\s()<>]+\)))*\))+(?:\(([^\s()<>]+|(\([^\s()<>]+\)))*\)|[^\s`!()\[\]{};:'\".,<>?«»“”‘’]))",
+        string,
+    )
+    return [x[0] for x in url]
+
+
+def snowflake_to_datetime(snowflake: int):
+    return datetime.utcfromtimestamp(((int(snowflake) >> 22) + 1420070400000) / 1000)

@@ -1,0 +1,13 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Test bot",
+      "type": "python",
+      "request": "launch",
+      "pythonArgs": ["-B"],
+      "program": "./llama.py",
+      "cwd": "${workspaceFolder}"
+    }
+  ]
+}
