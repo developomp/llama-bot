@@ -10,12 +10,6 @@ from discord.ext import commands
 
 
 class Pinning(commands.Cog):
-    # todo: check if emoji is usable by bot
-    # todo: add/remove pin reaction emoji
-    # todo: review message2embed
-    # todo: video pinning
-    # todo: add/remove roles/members that can pin messages
-
     def __init__(self, bot):
         self.bot = bot
 
@@ -107,7 +101,6 @@ You'll need at least one of the following roles to use this feature: {' | '.join
     async def message2embed(
         self, ctx: discord.ext.commands.Context, message: discord.Message
     ):
-        # todo: videos/images
         # todo: check if suppress_embeds flag is set
 
         has_video = False
@@ -160,7 +153,6 @@ You'll need at least one of the following roles to use this feature: {' | '.join
     # reaction pinning
     @commands.Cog.listener()
     async def on_raw_reaction_add(self, payload: discord.RawReactionActionEvent):
-        # todo: 10s cooldown per message
         # todo: if message pinning is a system message
         if payload.emoji not in self.pin_emojis:
             return
@@ -304,8 +296,7 @@ or
         help="Shows channels with reaction pinning enabled.",
     )
     async def pinnable(self, ctx: discord.ext.commands.Context):
-        # todo: hide channels when user doesn't have permission
-        # todo: fix channels no category not ordered properly
+        # todo: fix channels with no category not ordered properly
 
         # sort in order they're arranged in discord (sort by "position" attribute)
         sorted_channels: list[discord.abc.GuildChannel] = sorted(

@@ -7,11 +7,6 @@ from discord.ext import commands
 
 
 class Core(commands.Cog):
-    # todo: most recently executed command per user (last)
-    # todo: mention without pinging with embed
-    # todo: voting/poll (only admins can do it in restricted channels)
-    # todo: last command
-
     def __init__(self, bot):
         self.bot = bot
         self.bot.remove_command("help")
@@ -20,9 +15,6 @@ class Core(commands.Cog):
         help="Shows very basic information about the bot.",
     )
     async def about(self, ctx):
-        # todo: current git commit hash
-        # todo: show x versions behind
-        # todo: https://canary.discord.com/channels/457373827073048604/457384309935046669/819600781345816586
         uptime = str(timedelta(seconds=int(round(time() - self.bot.start_time))))
         bot_created_time = datetime.utcfromtimestamp(
             ((int(self.bot.user.id) >> 22) + 1420070400000) / 1000
@@ -70,8 +62,6 @@ Shows info about `ping` command:
 > {prefix}{command} ping""",
     )
     async def help(self, ctx, cog_str=None):
-        # todo: show some things only in allowed channels
-
         cogs = list(self.bot.cogs.keys())
 
         if not cog_str:
@@ -137,7 +127,7 @@ Shows info about `ping` command:
                                 prefix=self.bot.command_prefix, command=comm.name
                             )
                             if comm.usage
-                            else "Under construction...",  # todo: {command_name}
+                            else "Under construction...",
                         )
                     )
                     return

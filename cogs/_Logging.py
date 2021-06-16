@@ -5,16 +5,9 @@ from discord.ext import commands
 
 
 class Logging(commands.Cog):
-    # todo: better message deletion and edit logging (for #public-shaming)
-    # todo: highlight content difference for deleted and edited messages
-    # todo: separate snipe per channel
-    # todo: depth in snipe (3 in queue)
-    # todo: admin logging
-
     def __init__(self, bot):
         self.bot = bot
 
-        # todo: make it save and load from firebase
         self.log_edit = True
         self.remember_how_many = 3  # how many messages it will remember
 

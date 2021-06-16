@@ -12,20 +12,6 @@ import json
 
 
 class Llama(commands.Bot):
-    # todo: less firestore calls (cache locally?)
-    # todo: emojis in feedback message to make things more intuitive
-    # todo: message on new Homie
-    # todo: save role one leave and rejoin
-    # todo: llama bot website (llama.developomp.com for now then )
-    # todo: slash command
-    # todo: DM commands
-    # todo: logging
-    # todo: Features from Dyno, Carl, Dank memer, and redbot
-    # 	- https://wiki.dyno.gg
-    # 	- https://docs.carl.gg
-    # 	- https://dankmemer.lol
-    # 	- https://docs.discord.red
-
     def __init__(self, firebase_cred_path: str, prefix: str = "-"):
         super().__init__(
             help_command=None,  # overwrite with custom help command
@@ -65,7 +51,6 @@ class Llama(commands.Bot):
             print("----------[ The bot is not in LP server! ]----------")
             exit(-6969)
 
-        # todo: don't load roles until when necessary
         # load roles
         self.HIGHEST_ORDER = self.get_role_from_vars("HIGHEST_ORDER")
         self.LPWB_MEMBER = self.get_role_from_vars("LPWB_MEMBER")
@@ -81,6 +66,7 @@ class Llama(commands.Bot):
         ]
 
         # load cogs at the very last moment as some of them require data from the database
+        # load all cogs that does not begin with a underscore
         for cog in [
             f"cogs.{splitext(f)[0]}"
             for f in listdir("cogs")
@@ -99,8 +85,6 @@ class Llama(commands.Bot):
         error: discord.ext.commands.CommandError,
     ):
         """Gets executed when the bot encounters an error."""
-        # todo: pass message with exception
-        # todo: Error((title, description),) thingy
 
         error_message = str(error)
 

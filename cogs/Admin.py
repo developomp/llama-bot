@@ -6,8 +6,6 @@ from discord.ext import commands
 
 
 class Admin(commands.Cog):
-    # todo: check if draft id has space?
-
     def __init__(self, bot):
         self.bot = bot
 
@@ -110,7 +108,6 @@ Listing available drafts:
     async def draft(
         self, ctx, operation: str, draft_id: str = None, draft_id2: str = None
     ):
-        # todo: more consistent draft id highlighting
         """https://discord.com/developers/docs/resources/channel#embed-object"""
         await self.error_if_not_in_admin_channel(ctx)
 
