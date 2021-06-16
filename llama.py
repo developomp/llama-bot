@@ -5,18 +5,25 @@ import discord
 from discord.ext import commands
 
 from os import listdir
-from os.path import isfile, join, splitext
+from os.path import isfile, join, splitext, dirname, abspath
 from time import time
 import traceback
 import json
 
 
+def resolve_path(relative_path: str):
+    """
+    Converts relative path to absolute path for when the bot was executed in arbitrary path
+    """
+    return abspath(join(dirname(__file__), relative_path))
+
+
 class Llama(commands.Bot):
     def __init__(self, firebase_cred_path: str, prefix: str = "-"):
         super().__init__(
-            help_command=None,  # overwrite with custom help command
+            help_command=None,  # to overwrite with custom help command
             command_prefix=prefix,
-            case_insensitive=False,
+            case_insensitive=True,  # allow mix of lower cae and upper case for commands
         )
 
         # my own firestore interface
@@ -24,6 +31,8 @@ class Llama(commands.Bot):
 
         # read all variables in the beginning to save time later
         self.VARS = self.llama_firebase.read_collection("vars")
+
+        self.server_id = 457373827073048604
 
         # IDs of users who can run owners only commands
         self.owner_ids: set = {501277805540147220, 396333737148678165}
@@ -45,7 +54,7 @@ class Llama(commands.Bot):
 
         # Prevents bot from running in server other than LP's
         self.LP_SERVER: discord.Guild = next(
-            (guild for guild in self.guilds if guild.id == 457373827073048604), None
+            (guild for guild in self.guilds if guild.id == self.server_id), None
         )
         if not self.LP_SERVER:
             print("----------[ The bot is not in LP server! ]----------")
@@ -67,10 +76,11 @@ class Llama(commands.Bot):
 
         # load cogs at the very last moment as some of them require data from the database
         # load all cogs that does not begin with a underscore
+        cogs_dir = resolve_path("./cogs")
         for cog in [
             f"cogs.{splitext(f)[0]}"
-            for f in listdir("cogs")
-            if isfile(join("cogs", f)) and not f[0] == "_"
+            for f in listdir(cogs_dir)
+            if isfile(join(cogs_dir, f)) and not f[0] == "_"
         ]:
             print(f"loading cog: {cog}")
             self.load_extension(cog)
@@ -193,16 +203,16 @@ class Llama(commands.Bot):
 
 
 def main():
-    with open("res/config.json", "rt") as f:
+    with open(resolve_path("./config.json"), "rt") as f:
         config = json.loads(f.read())
 
-    # not using os.environ because it's feels like a hacky solution enough for my liking
-    with open("secrets/secret.json", "rt") as f:
+    with open(resolve_path("./secrets/secret.json"), "rt") as f:
         secret = json.loads(f.read())
 
     llama_bot = Llama(
-        "secrets/firebase-adminsdk.json",
-        config["prefix"] if config["prefix"] else "-",  # default prefix is "-"
+        resolve_path("./secrets/firebase-adminsdk.json"),
+        # set default prefix to "-" if not specified
+        config["prefix"] if config["prefix"] else "-",
     )
 
     llama_bot.run(secret["token"])
