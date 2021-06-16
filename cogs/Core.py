@@ -1,3 +1,4 @@
+import sys
 from time import time
 from datetime import timedelta, datetime
 
@@ -31,17 +32,25 @@ class Core(commands.Cog):
         await ctx.send(
             embed=discord.Embed(title="About llama bot")
             .set_thumbnail(url=self.bot.user.avatar_url)
+            .add_field(
+                name="Python version",
+                value=sys.version.split()[0],
+            )
+            .add_field(
+                name="Discord.py version",
+                value=discord.__version__,
+            )
             .add_field(name="Bot ID", value=f"{self.bot.user.id}")
             .add_field(
                 name="Created in (UTC)",
-                value=f"{bot_created_time.strftime('%Y-%m-%d %H:%M:%S')} ({bot_created_delta.days}days ago)",
+                value=f"{bot_created_time.strftime('%Y-%m-%d %H:%M:%S')} ({bot_created_delta.days} days ago)",
             )
+            .add_field(name="Uptime", value=uptime, inline=False)
             .add_field(
                 name="Source Code",
                 value="https://github.com/developomp/llama-bot",
                 inline=False,
             )
-            .add_field(name="Uptime", value=uptime, inline=False)
         )
 
     @commands.command(
