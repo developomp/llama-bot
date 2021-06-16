@@ -1,10 +1,6 @@
-import os
 import nekos
 import random
-import os.path
-import requests
 from PIL import Image, ImageDraw
-from io import BytesIO
 
 import discord
 from discord.ext import commands
@@ -50,13 +46,6 @@ class Fun(commands.Cog):
         self.quotes = self.bot.VARS["settings"]["quotes"]
         random.shuffle(self.quotes)
         self.quote_index = 0
-
-        self.fuck_template_image: Image.Image = Image.open(
-            os.path.abspath("res/fuck.png")
-        )
-        self.fuck_hair_template_image: Image.Image = Image.open(
-            os.path.abspath("res/fuck_hair.png")
-        )
 
     @commands.command(
         aliases=[
@@ -114,38 +103,6 @@ Show penis length of <@501277805540147220> and <@641574882382970891>
         await ctx.send(
             embed=discord.Embed(title="Here's your pp list", description=msg)
         )
-
-    @commands.command(
-        help="Shows an image of someone getting fucked",
-        usage="""> {prefix}{command} <user>
-
-user can be a discord ID or a mention (ping).""",
-    )
-    @commands.is_nsfw()
-    async def fuck(self, ctx: discord.ext.commands.Context, victim: discord.Member):
-        # todo: says fuck you <user mention>
-        # todo: furry image for furry role
-        # 	https://discord.com/channels/457373827073048604/764013857634516992/783869713737711666
-        # 	https://discord.com/channels/457373827073048604/764013857634516992/783877435758215169
-        image = self.fuck_template_image.copy()
-        image.alpha_composite(
-            crop_circle(Image.open(BytesIO(requests.get(victim.avatar_url).content))),
-            (320, 170),
-        )
-        image.alpha_composite(self.fuck_hair_template_image)
-
-        with BytesIO() as img_byte_arr:
-            image.save(img_byte_arr, format="PNG", quality=100)
-            img_byte_arr.seek(0)
-
-            await ctx.send(
-                file=discord.File(
-                    fp=img_byte_arr, filename=f"fuck_{ctx.author.id}_{victim.id}.png"
-                ),
-                embed=discord.Embed(
-                    title="F U C K", description=f"fucking {victim.mention}"
-                ),
-            )
 
     @commands.command(
         help="Owoifies your message. OwO",
