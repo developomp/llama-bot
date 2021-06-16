@@ -4,6 +4,7 @@
 <a href="https://opensource.org/licenses/MIT"><img alt="MIT License" src="https://img.shields.io/github/license/developomp/llama-bot?style=flat-square" /></a>
 <a href="https://www.python.org/downloads/release/python-395"><img alt="Python version 3.9" src="https://img.shields.io/badge/python-3.9-blue?style=flat-square" /></a>
 <a href="https://github.com/psf/black"><img alt="Code style: black" src="https://img.shields.io/badge/code style-black-000000.svg?style=flat-square"></a>
+<a href="https://dsc.gg/llama"> <img alt="Discord" src="https://img.shields.io/discord/457373827073048604"></a>
 </div>
 
 ![llama logo](logo.png)
@@ -12,7 +13,7 @@
 
 This repository contains source code for the llama bot.<br />
 
-- Discord bot made for [one specific server](https://dsc.gg/llama). Making it work on other servers will need some work.
+- Discord bot made for the [LP discord server](https://dsc.gg/llama). Making it work on other servers will need some work.
 - Invitation of this bot to other server is blocked due to potential server performance issue. You wll have to host the bot yourself if you want it on your discord server.
 - The bot requires Python version 3.9 or greater.
 - local configuration file and database does not exist. Everything is stored in google firebase.
