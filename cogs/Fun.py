@@ -98,13 +98,20 @@ Show penis length of <@501277805540147220> and <@641574882382970891>
         )
 
     @commands.command(
-        help="Owoifies your message. OwO",
-        usage="""> {prefix}{command} <text>
-ex:
-> {prefix}{command} hello there my old friend""",
+        help="Call for help.",
     )
-    async def owo(self, ctx, *text):
-        await ctx.send(nekos.owoify(" ".join(text)))
+    async def fix(self, ctx: discord.ext.commands.Context):
+        """
+        Bug report feature.
+        Removed due to excessive pinging
+
+        old code:
+        await ctx.send(f"Yo {', '.join([f'<@{fixer_id}>' for fixer_id in self.bot.fixer_ids])} fix this shit")
+        """
+
+        await ctx.send(
+            f"Fuck you {ctx.message.author.mention} <:coronalol:692323993419776020>"
+        )
 
     @commands.command(
         help="Shows image matching search term",
