@@ -27,34 +27,32 @@ Required knowledge:
 - python
 - firebase
 - discord bots
-- linux systemd services
 
 Steps:
 
 1. Clone this repo
    - `git clone --depth 1 https://github.com/developomp/llama-bot.git` (`--depth 1` is to save storage space)
-2. create `secrets` directory in the cloned repository
-3. Create a new discord bot
+2. Open [`bot`](./bot) directory
+3. create `secrets` directory
+4. Create a new discord bot
    - https://discord.com/developers/applications
-4. Create a firebase project and enable firestore database
+5. Create a firebase project and enable firestore database
    - https://console.firebase.google.com
-5. Generate and download service account key from firebase, rename it to `firebase-adminsdk.json`, and put it in `secrets` directory.
+6. Generate and download service account key from firebase, rename it to `firebase-adminsdk.json`, and put it in `secrets` directory.
    - https://console.firebase.google.com/project/_/settings/serviceaccounts/adminsdk
-6. create `secret.json` in `secrets` directory and put the discord bot token
+7. create `secret.json` in `secrets` directory and put the discord bot token
    ```json
    {
      "token": "<TOKEN>"
    }
    ```
-7. Install dependencies
+8. Install dependencies ([requirements.txt](./requirements.txt) is in project root)
 
    - `pip install -r requirements.txt`
 
-8. Start the bot
+9. Start the bot
 
    - `python llama.py`
-
-9. Create a systemd service.
 
 More info:
 
