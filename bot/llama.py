@@ -220,7 +220,7 @@ def main():
         resolve_path("./secrets/firebase-adminsdk.json"),
         # set default prefix
         (config["prefix"] if "prefix" in config else default_prefix)
-        if config
+        if config in locals()
         else default_prefix,
     )
 
