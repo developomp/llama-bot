@@ -3,5 +3,10 @@
   "editor.formatOnPaste": true,
 
   "python.formatting.provider": "black",
-  "python.analysis.extraPaths": ["./bot"]
+  "python.analysis.extraPaths": [
+    "./bot"
+  ],
+  "cSpell.words": [
+    "pinnable"
+  ]
 }
