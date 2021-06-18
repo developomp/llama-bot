@@ -205,16 +205,23 @@ class Llama(commands.Bot):
 
 
 def main():
-    with open(resolve_path("./config.json"), "rt") as f:
-        config = json.loads(f.read())
+    # ignore if config.json does not exist
+    try:
+        with open(resolve_path("./config.json"), "rt") as f:
+            config = json.loads(f.read())
+    except FileNotFoundError:
+        pass
 
     with open(resolve_path("./secrets/secret.json"), "rt") as f:
         secret = json.loads(f.read())
 
+    default_prefix = "-"
     llama_bot = Llama(
         resolve_path("./secrets/firebase-adminsdk.json"),
-        # set default prefix to "-" if not specified
-        config["prefix"] if "prefix" in config else "-",
+        # set default prefix
+        (config["prefix"] if "prefix" in config else default_prefix)
+        if config
+        else default_prefix,
     )
 
     llama_bot.run(secret["token"])
