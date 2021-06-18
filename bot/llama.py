@@ -214,7 +214,7 @@ def main():
     llama_bot = Llama(
         resolve_path("./secrets/firebase-adminsdk.json"),
         # set default prefix to "-" if not specified
-        config["prefix"] if config["prefix"] else "-",
+        config["prefix"] if "prefix" in config else "-",
     )
 
     llama_bot.run(secret["token"])
