@@ -1,40 +1,15 @@
-import nekos
-import random
-from PIL import Image, ImageDraw
+from llama import Llama
 
 import discord
 from discord.ext import commands
 
-
-def crop_circle(pil_img: Image.Image):
-    # I can't get transparent background to work
-
-    # crop center square
-    new_size = min(pil_img.size)
-    img_width, img_height = pil_img.size
-    pil_img = pil_img.crop(
-        (
-            (img_width - new_size) // 2,
-            (img_height - new_size) // 2,
-            (img_width + new_size) // 2,
-            (img_height + new_size) // 2,
-        )
-    )
-
-    # create circle mask
-    mask = Image.new("L", pil_img.size)
-    draw = ImageDraw.Draw(mask)
-    draw.ellipse((0, 0, pil_img.width, pil_img.height), fill=255)
-    pil_img.putalpha(mask)
-
-    # resize and return
-    final_size = 160
-    return pil_img.resize((final_size, final_size))
+import nekos
+import random
 
 
 class Fun(commands.Cog):
     def __init__(self, bot):
-        self.bot = bot
+        self.bot: Llama = bot
 
         self.quotes = self.bot.VARS["settings"]["quotes"]
         random.shuffle(self.quotes)

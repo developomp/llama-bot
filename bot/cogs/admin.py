@@ -1,13 +1,15 @@
+from llama import Llama
 import cogs._util as util
-import json
 
 import discord
 from discord.ext import commands
 
+import json
+
 
 class Admin(commands.Cog):
     def __init__(self, bot):
-        self.bot = bot
+        self.bot: Llama = bot
 
         self.allowed_channels: list[discord.TextChannel] = [
             self.bot.LP_SERVER.get_channel(int(self.bot.VARS["channels"]["ADMIN_BOT"])),

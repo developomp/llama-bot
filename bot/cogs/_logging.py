@@ -1,12 +1,14 @@
-import datetime
+from llama import Llama
 
 import discord
 from discord.ext import commands
 
+import datetime
+
 
 class Logging(commands.Cog):
     def __init__(self, bot):
-        self.bot = bot
+        self.bot: Llama = bot
 
         self.log_edit = True
         self.remember_how_many = 3  # how many messages it will remember

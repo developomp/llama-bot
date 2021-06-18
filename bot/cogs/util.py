@@ -1,13 +1,15 @@
+from llama import Llama
 from . import _util as util
-from datetime import datetime
 
 import discord
 from discord.ext import commands
 
+from datetime import datetime
+
 
 class Util(commands.Cog):
     def __init__(self, bot):
-        self.bot = bot
+        self.bot: Llama = bot
 
     @commands.command(
         help="Calculates of when a discord ID (aka snowflake) was created.",

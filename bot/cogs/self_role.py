@@ -1,13 +1,15 @@
+from llama import Llama
 from . import _util as util
-import re
 
 import discord
 from discord.ext import commands
 
+import re
+
 
 class SelfRole(commands.Cog):
     def __init__(self, bot):
-        self.bot = bot
+        self.bot: Llama = bot
 
         # {"CHANNEL_ID/MESSAGE_ID": ["EMOJI_ID_OR_NAME;ROLE_ID", ...], ...}
         self.binds: dict = self.bot.llama_firebase.read("vars", "selfrole_messages")
