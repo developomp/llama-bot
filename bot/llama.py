@@ -19,6 +19,8 @@ def resolve_path(relative_path: str):
 
 
 class Llama(commands.Bot):
+    LP_SERVER: discord.Guild
+
     def __init__(self, firebase_cred_path: str, prefix: str = "-"):
         super().__init__(
             help_command=None,  # to overwrite with custom help command

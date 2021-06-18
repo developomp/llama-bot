@@ -1,9 +1,9 @@
-# Original code from: https://github.com/aurzen/pinbot
+from llama import Llama
 import re
 import datetime
 import operator
 import traceback
-import cogs._util as util
+from . import _util as util
 
 import discord
 from discord.ext import commands
@@ -11,25 +11,33 @@ from discord.ext import commands
 
 class Pinning(commands.Cog):
     def __init__(self, bot):
-        self.bot = bot
+        self.bot: Llama = bot
 
+        # Emojis that will be used to pin a message
         self.pin_emojis: set[discord.PartialEmoji] = set()
-        for emoji_raw in self.bot.VARS["pinbot"][
-            "pin_reaction"
-        ]:  # either unicode or int (emoji name or emoji id)
+
+        # emoji_raw is either unicode or int (emoji name or emoji id)
+        for emoji_raw in self.bot.VARS["pinbot"]["pin_reaction"]:
+            # remove leading/trailing whitespaces
             emoji_raw: str = emoji_raw.strip()
-            try:  # test if data is int
+
+            # test if emoji_raw is int
+            try:
                 emoji_id: int = int(emoji_raw)
-                emoji: discord.Emoji = self.bot.get_emoji(emoji_id)
+
+                # check if emoji exists
+                emoji: discord.Emoji = self.bot.LP_SERVER.get_emoji(emoji_id)
                 if not emoji:
                     print(f"Cannot convert {emoji_raw} to discord Emoji.")
-                    return
+                    continue
+
                 self.pin_emojis.add(
                     discord.PartialEmoji(
                         name=emoji.name, animated=emoji.animated, id=emoji_id
                     )
                 )
-            except ValueError:  # if data is not int
+            except ValueError:
+                # todo: test if emoji is valid
                 self.pin_emojis.add(discord.PartialEmoji(name=emoji_raw))
 
         self.recently_pinned_ids: set[
