@@ -7,7 +7,7 @@
 <a href="https://dsc.gg/llama"> <img alt="Discord" src="https://img.shields.io/discord/457373827073048604?style=flat-square"></a>
 </div>
 
-![llama logo](logo.png)
+![llama logo](.github/logo.png)
 
 > **WARNING: THIS REPOSITORY CONTAINS NSFW CONTENT**
 
@@ -18,7 +18,7 @@ This repository contains source code for the llama bot.<br />
 - The bot requires Python version 3.9 or greater.
 - local configuration file and database does not exist. Everything is stored in google firebase.
 
-![example image of bot usage](example.png)
+![example image of bot usage](.github/example.png)
 
 # Setting up locally
 
