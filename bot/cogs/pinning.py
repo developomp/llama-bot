@@ -226,7 +226,8 @@ You'll need at least one of the following roles to use this feature: {' | '.join
     async def on_guild_channel_pins_update(
         self, channel: discord.abc.GuildChannel, last_pin: datetime.datetime
     ):
-        print(channel, last_pin)
+        pass
+        # print(channel, last_pin)
 
     @commands.command(
         aliases=[
