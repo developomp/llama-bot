@@ -1,4 +1,4 @@
-import cogs._util as util
+from . import _util as util
 from datetime import datetime
 
 import discord
