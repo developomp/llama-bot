@@ -4,8 +4,7 @@ import cogs._util as util
 import discord
 from discord.ext import commands
 
-from os import listdir
-from os.path import isfile, join, splitext, dirname, abspath
+from os import listdir, path
 from time import time
 import traceback
 import json
@@ -15,7 +14,7 @@ def resolve_path(relative_path: str):
     """
     Converts relative path to absolute path for when the bot was executed in arbitrary path
     """
-    return abspath(join(dirname(__file__), relative_path))
+    return path.abspath(path.join(path.dirname(__file__), relative_path))
 
 
 class Llama(commands.Bot):
@@ -69,9 +68,9 @@ class Llama(commands.Bot):
         # load all cogs that does not begin with a underscore
         cogs_dir = resolve_path("./cogs")
         for cog in [
-            f"cogs.{splitext(f)[0]}"
+            f"cogs.{path.splitext(f)[0]}"
             for f in listdir(cogs_dir)
-            if isfile(join(cogs_dir, f)) and not f[0] == "_"
+            if path.isfile(path.join(cogs_dir, f)) and not f[0] == "_"
         ]:
             print(f"loading cog: {cog}")
             self.load_extension(cog)
