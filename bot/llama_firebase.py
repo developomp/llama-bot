@@ -1,22 +1,17 @@
-import firebase_admin
-from firebase_admin import credentials, firestore
+import firebase_admin, firebase_admin.firestore
 
 
 class LlamaFirebase:
-    # https://firebase.google.com/docs/firestore
+    """
+    A simple firebase firestore interface I made for the bot.
+    More information about firestore can be found here:
+    https://firebase.google.com/docs/firestore
+    """
 
     def __init__(self, certificate_path):
-        # Document -> google.cloud.firestore_v1.document
-
-        cred = credentials.Certificate(certificate_path)
+        cred = firebase_admin.credentials.Certificate(certificate_path)
         firebase_admin.initialize_app(cred, {"projectId": cred.project_id})
-        self.db = firestore.client()
-
-    def read_all(self):
-        return {
-            collection.id: {doc.id: doc.to_dict() for doc in collection.stream()}
-            for collection in self.db.collections()
-        }
+        self.db = firebase_admin.firestore.client()
 
     def read_collection(self, collection_name):
         return {
@@ -43,7 +38,7 @@ class LlamaFirebase:
         return (
             self.db.collection(u"%s" % collection_name)
             .document(u"%s" % document_name)
-            .update({u"%s" % data_name: firestore.DELETE_FIELD})
+            .update({u"%s" % data_name: firebase_admin.firestore.DELETE_FIELD})
         )
 
     def exists(self, collection_name, discord_id):
