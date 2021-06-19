@@ -1,3 +1,4 @@
+from discord.channel import TextChannel
 from llama import Llama
 from . import _util as util
 
@@ -8,6 +9,7 @@ import re
 import datetime
 import operator
 import traceback
+from threading import Timer
 
 
 class Pinning(commands.Cog):
@@ -17,7 +19,22 @@ class Pinning(commands.Cog):
         # Emojis that will be used to pin a message
         self.pin_emojis: set[discord.PartialEmoji] = set()
 
-        # emoji_raw is either unicode or int (emoji name or emoji id)
+        # A set of (channel_id, message_id) tuple that are waiting for pin cooldown.
+        # Messages in this list can't be pinned.
+        # This is here to prevent pin spamming or accidental double pin
+        self.recently_pinned_messages: set[(int, int)] = set()
+
+        # message pin cooldown per message measured in seconds
+        self.pin_cooldown: float = 10.0
+
+        # A set of (source_channel_id, destination_channel_id) tuple where the pins will be mapped.
+        self.channel_maps: set[(int, int)] = self.channel_maps_read()
+
+        # A set of discord text channels with reaction pinning enabled.
+        # not using channel ids and position because it makes the code messier without providing much performace benefits.
+        self.pinnable_channels: set[discord.TextChannel] = self.pinnable_channels_read()
+
+        # emoji_raw is either unicode string or int (emoji name or emoji id)
         for emoji_raw in self.bot.VARS["pinbot"]["pin_reaction"]:
             # remove leading/trailing whitespaces
             emoji_raw: str = emoji_raw.strip()
@@ -37,19 +54,10 @@ class Pinning(commands.Cog):
                         name=emoji.name, animated=emoji.animated, id=emoji_id
                     )
                 )
-            except ValueError:
-                # todo: test if emoji is valid
+            except ValueError:  # if emoji_raw is not a number
+                # todo: test if emoji is valid.
+                # todo: The checks that can be found online only works for custom emojis and not for emojis like 📌 or 📍.
                 self.pin_emojis.add(discord.PartialEmoji(name=emoji_raw))
-
-        self.recently_pinned_ids: set[
-            discord.Message
-        ] = set()  # Messages in this list can't be pinned.
-        self.channel_maps: set = (
-            self.channel_maps_read()
-        )  # Collection of source and destination channels where the pins will be mapped.
-        self.pinnable_channels: set = (
-            self.pinnable_channels_read()
-        )  # Channels with reaction pinning enabled.
 
         self.help_msg = ""
         self.main_help_fields = [
@@ -60,8 +68,8 @@ You'll need at least one of the following roles to use this feature: {' | '.join
             ],
         ]
 
-    def channel_maps_read(self) -> set[tuple]:
-        res: set[tuple] = set()
+    def channel_maps_read(self) -> set[(int, int)]:
+        res: set[(int, int)] = set()
         self.bot.VARS["pinbot"] = self.bot.llama_firebase.read("vars", "pinbot")
         for map_str in self.bot.VARS["pinbot"]["maps"]:
             try:
@@ -86,12 +94,12 @@ You'll need at least one of the following roles to use this feature: {' | '.join
             ["%s,%s" % (i[0].id, i[1].id) for i in self.channel_maps],
         )
 
-    def pinnable_channels_read(self) -> set[discord.abc.Messageable]:
-        res: set[discord.abc.Messageable] = set()
+    def pinnable_channels_read(self) -> set[int]:
+        res: set[discord.TextChannel] = set()
         self.bot.VARS["pinbot"] = self.bot.llama_firebase.read("vars", "pinbot")
         for channel_id in self.bot.VARS["pinbot"]["allowed_channels"]:
             try:
-                channel = self.bot.get_channel(int(channel_id))
+                channel: discord.TextChannel = self.bot.get_channel(int(channel_id))
                 assert channel, f"channel {channel_id} does not exist in the LP server"
                 res.add(channel)
             except (AssertionError, ValueError):
@@ -104,12 +112,10 @@ You'll need at least one of the following roles to use this feature: {' | '.join
             "vars",
             "pinbot",
             "allowed_channels",
-            ["%s" % i.id for i in self.pinnable_channels],
+            ["%s" % channel.id for channel in self.pinnable_channels],
         )
 
-    async def message2embed(
-        self, ctx: discord.ext.commands.Context, message: discord.Message
-    ):
+    async def message2embed(self, ctx: commands.Context, message: discord.Message):
         # todo: check if suppress_embeds flag is set
 
         has_video = False
@@ -162,14 +168,22 @@ You'll need at least one of the following roles to use this feature: {' | '.join
     # reaction pinning
     @commands.Cog.listener()
     async def on_raw_reaction_add(self, payload: discord.RawReactionActionEvent):
-        # todo: if message pinning is a system message
         if payload.emoji not in self.pin_emojis:
             return
 
-        channel: discord.abc.Messageable = self.bot.get_channel(payload.channel_id)
+        channel: discord.TextChannel = self.bot.get_channel(payload.channel_id)
         message: discord.Message = await channel.fetch_message(payload.message_id)
 
         if channel not in self.pinnable_channels:
+            return
+
+        channel_message_tuple: tuple(int, int) = (channel.id, message.id)
+        if channel_message_tuple in self.recently_pinned_messages:
+            await channel.send(
+                embed=discord.Embed(
+                    description=f"waiting for {self.pin_cooldown} second message pin cooldown!"
+                )
+            )
             return
 
         original_message_content = f"pinning [a message]({message.jump_url}) as requested by: {payload.member.mention}"
@@ -217,6 +231,12 @@ You'll need at least one of the following roles to use this feature: {' | '.join
             )
             return
 
+        self.recently_pinned_messages.add(channel_message_tuple)
+        Timer(
+            self.pin_cooldown,
+            lambda: self.recently_pinned_messages.remove(channel_message_tuple),
+        ).start()
+
         await original_message.edit(
             embed=discord.Embed(description=original_message_content + "\nsuccess!")
         )
@@ -226,8 +246,8 @@ You'll need at least one of the following roles to use this feature: {' | '.join
     async def on_guild_channel_pins_update(
         self, channel: discord.abc.GuildChannel, last_pin: datetime.datetime
     ):
-        pass
         # print(channel, last_pin)
+        pass
 
     @commands.command(
         aliases=[
@@ -248,9 +268,9 @@ or
     )
     @util.must_be_admin()
     async def reactionpin(
-        self, ctx: discord.ext.commands.Context, operation: str, *raw_channels: str
+        self, ctx: commands.Context, operation: str, *raw_channels: str
     ):
-        channels: set = set()
+        channels: set[int] = set()
 
         if not raw_channels:
             await ctx.send(
@@ -263,7 +283,7 @@ or
 
         for channel_str in raw_channels:
             try:
-                channel = self.bot.LP_SERVER.get_channel(
+                channel: TextChannel = self.bot.LP_SERVER.get_channel(
                     int(re.findall(r"\d+", channel_str)[0])
                 )
                 assert channel
@@ -278,7 +298,7 @@ or
                 return
 
         def channels_to_mentions():
-            return "\n-".join([_channel.mention for _channel in channels])
+            return "\n-".join([channel.mention for channel in channels])
 
         if operation in ["enable", "e"]:
             self.pinnable_channels.update(channels)
@@ -305,7 +325,7 @@ or
     @commands.command(
         help="Shows channels with reaction pinning enabled.",
     )
-    async def pinnable(self, ctx: discord.ext.commands.Context):
+    async def pinnable(self, ctx: commands.Context):
         # todo: fix channels with no category not ordered properly
 
         # sort in order they're arranged in discord (sort by "position" attribute)
@@ -354,7 +374,7 @@ ex:
     @util.must_be_admin()
     async def map(
         self,
-        ctx: discord.ext.commands.Context,
+        ctx: commands.Context,
         operation: str,
         source_channel_raw: str,
         destination_channel_raw: str,
@@ -433,7 +453,7 @@ ex:
         self.channel_maps_write()
 
     @commands.command(help="Shows list of pin source and destination channels.")
-    async def maps(self, ctx: discord.ext.commands.Context):
+    async def maps(self, ctx: commands.Context):
         # todo: order channels
         description = ""
 
@@ -448,5 +468,5 @@ ex:
         await ctx.send(embed=discord.Embed(title="Pin maps", description=description))
 
 
-def setup(bot: discord.ext.commands.Bot):
+def setup(bot: commands.Bot):
     bot.add_cog(Pinning(bot))
