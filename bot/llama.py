@@ -20,6 +20,10 @@ def resolve_path(relative_path: str):
 
 class Llama(commands.Bot):
     LP_SERVER: discord.Guild
+    server_id = 457373827073048604
+
+    # IDs of users who can run owners only commands
+    owner_ids: set = {501277805540147220, 396333737148678165}
 
     def __init__(self, firebase_cred_path: str, prefix: str = "-"):
         super().__init__(
@@ -34,25 +38,10 @@ class Llama(commands.Bot):
         # read all variables in the beginning to save time later
         self.VARS = self.llama_firebase.read_collection("vars")
 
-        self.server_id = 457373827073048604
-
-        # IDs of users who can run owners only commands
-        self.owner_ids: set = {501277805540147220, 396333737148678165}
-        # Pinged/DMed when there's an issue with the bot
-        self.fixer_ids: set = {501277805540147220}
-
     # ----- [ DISCORD.PY STUFF ] -----
 
     async def on_ready(self):
-        """https://discordpy.readthedocs.io/en/latest/api.html#discord.on_ready
-        Called when the client is done preparing the data received from Discord.
-        Usually after login is successful and the Client.guilds and co. are filled up.
-
-        **WARNING**:
-        This function is not guaranteed to be the first event called.
-        Likewise, this function is not guaranteed to only be called once.
-        Discord.py implements reconnection logic and thus will end up calling this event whenever a RESUME request fails.
-        """
+        """https://discordpy.readthedocs.io/en/latest/api.html#discord.on_ready"""
 
         # Prevents bot from running in server other than LP's
         self.LP_SERVER: discord.Guild = next(
