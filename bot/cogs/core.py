@@ -19,7 +19,7 @@ class Core(commands.Cog):
     async def cog_check(self, ctx: commands.Context):
         if exception_or_bool := await util.on_pm(ctx.message, self.bot):
             raise exception_or_bool
-        return exception_or_bool
+        return not exception_or_bool
 
     @commands.command(
         help="Shows very basic information about the bot.",

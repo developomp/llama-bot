@@ -52,7 +52,7 @@ You'll need at least one of the following roles to use this feature: {' | '.join
     async def cog_check(self, ctx: commands.Context):
         if exception_or_bool := await util.on_pm(ctx.message, self.bot):
             raise exception_or_bool
-        return exception_or_bool
+        return not exception_or_bool
 
     def channel_maps_read(self) -> set[(int, int)]:
         res: set[(int, int)] = set()
