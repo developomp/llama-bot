@@ -209,6 +209,15 @@ ex:
             embed=discord.Embed(title="Fact of the day", description=nekos.fact())
         )
 
+    @commands.command(
+        aliases=[
+            "clapify",
+        ],
+        help="does the karen clap thing",
+    )
+    async def clap(self, ctx, *args):
+        await ctx.send(" :clap: ".join(args))
+
 
 def setup(bot):
     bot.add_cog(Fun(bot))
