@@ -91,7 +91,7 @@ class Llama(commands.Bot):
             print(f"loading cog: {cog}")
             try:
                 self.load_extension(cog)
-            except discord.ExtensionAlreadyLoaded:
+            except commands.ExtensionAlreadyLoaded:
                 print(f"Extension {cog} was already loaded. Skipping.")
 
         # to show bot uptime
