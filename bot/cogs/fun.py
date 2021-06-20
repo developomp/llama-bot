@@ -213,7 +213,7 @@ ex:
         aliases=[
             "clapify",
         ],
-        help="does the karen clap thing",
+        help="does the karen clap thing. Does not work with external emojis",
     )
     async def clap(self, ctx, *args):
         await ctx.send(" :clap: ".join(args))
