@@ -203,14 +203,15 @@ def main():
     with open(resolve_path("./secrets/secret.json"), "rt") as f:
         secret = json.loads(f.read())
 
-    llama_bot = Llama(
-        resolve_path("./secrets/firebase-adminsdk.json"),
-        # set default prefix if it exists
+    # set default prefix if it exists
+    prefix = (
         (config["prefix"] if "prefix" in config else None)
         if "config" in locals()
-        else None,
+        else None
     )
+    firebase_path = resolve_path("./secrets/firebase-adminsdk.json")
 
+    llama_bot = Llama(firebase_path, prefix) if prefix else Llama(firebase_path)
     llama_bot.run(secret["token"])
 
 
