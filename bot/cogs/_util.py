@@ -1,9 +1,12 @@
 # I'm aware that I can use @commands.bot_has_permissions. It's a choice.
-from datetime import datetime
-import re
+from llama import Llama
 
 import discord
 from discord.ext import commands
+
+from datetime import datetime
+from typing import Union
+import re
 
 
 class NotAdminChannel(discord.ext.commands.errors.CheckFailure):
@@ -11,7 +14,8 @@ class NotAdminChannel(discord.ext.commands.errors.CheckFailure):
 
 
 def must_be_admin():
-    """Discord bot command decorator.
+    """
+    Discord bot command decorator.
     Put it under @discord.ext.commands.command()
     """
 
@@ -29,12 +33,15 @@ def must_be_admin():
 
 
 def lists_has_intersection(list1: list, list2: list) -> bool:
-    """Checks if any of the roles in roles1 is in roles2"""
+    """
+    Checks if any of the roles in roles1 is in roles2
+    """
     return any(element in list1 for element in list2)
 
 
 def url_from_str(string: str) -> list:
-    """Extract urls from string
+    """
+    Extract urls from string
     https://daringfireball.net/2010/07/improved_regex_for_matching_urls
     """
     url = re.findall(
@@ -46,3 +53,22 @@ def url_from_str(string: str) -> list:
 
 def snowflake_to_datetime(snowflake: int):
     return datetime.utcfromtimestamp(((int(snowflake) >> 22) + 1420070400000) / 1000)
+
+
+def convert_to_partial_emoji(raw: Union[str, int], bot: Llama) -> discord.PartialEmoji:
+    # test if raw is an integer
+    try:
+        emoji_id: int = int(raw)
+
+        # check if emoji exists
+        emoji: discord.Emoji = bot.LP_SERVER.get_emoji(emoji_id)
+        if not emoji:
+            raise Exception(f"Cannot convert {raw} to discord Emoji.")
+
+        return discord.PartialEmoji(
+            name=emoji.name, animated=emoji.animated, id=emoji_id
+        )
+    except ValueError:  # if emoji_raw is not a number
+        # todo: test if emoji is valid.
+        # todo: The checks that can be found online only works for custom emojis and not for emojis like 📌 or 📍.
+        return discord.PartialEmoji(name=raw.strip())

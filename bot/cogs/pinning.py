@@ -1,4 +1,3 @@
-from discord.channel import TextChannel
 from llama import Llama
 from . import _util as util
 
@@ -36,28 +35,10 @@ class Pinning(commands.Cog):
 
         # emoji_raw is either unicode string or int (emoji name or emoji id)
         for emoji_raw in self.bot.VARS["pinbot"]["pin_reaction"]:
-            # remove leading/trailing whitespaces
-            emoji_raw: str = emoji_raw.strip()
-
-            # test if emoji_raw is int
             try:
-                emoji_id: int = int(emoji_raw)
-
-                # check if emoji exists
-                emoji: discord.Emoji = self.bot.LP_SERVER.get_emoji(emoji_id)
-                if not emoji:
-                    print(f"Cannot convert {emoji_raw} to discord Emoji.")
-                    continue
-
-                self.pin_emojis.add(
-                    discord.PartialEmoji(
-                        name=emoji.name, animated=emoji.animated, id=emoji_id
-                    )
-                )
-            except ValueError:  # if emoji_raw is not a number
-                # todo: test if emoji is valid.
-                # todo: The checks that can be found online only works for custom emojis and not for emojis like 📌 or 📍.
-                self.pin_emojis.add(discord.PartialEmoji(name=emoji_raw))
+                self.pin_emojis.add(util.convert_to_partial_emoji(emoji_raw, self.bot))
+            except Exception:
+                traceback.print_exc()
 
         self.help_msg = ""
         self.main_help_fields = [
@@ -283,7 +264,7 @@ or
 
         for channel_str in raw_channels:
             try:
-                channel: TextChannel = self.bot.LP_SERVER.get_channel(
+                channel: discord.channel.TextChannel = self.bot.LP_SERVER.get_channel(
                     int(re.findall(r"\d+", channel_str)[0])
                 )
                 assert channel
