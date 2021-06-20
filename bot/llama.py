@@ -109,7 +109,7 @@ class Llama(commands.Bot):
         Gets executed when the bot encounters an error.
         """
 
-        err_title: str = ""
+        err_title: str = "Error"
         err_description: str = f"Command: {ctx.message.content.split()[0]}"
 
         if isinstance(error, util.NotAdminChannel):
