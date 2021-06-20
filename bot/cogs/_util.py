@@ -1,4 +1,5 @@
 # I'm aware that I can use @commands.bot_has_permissions. It's a choice.
+from discord import guild
 from llama import Llama
 
 import discord
@@ -72,3 +73,18 @@ def convert_to_partial_emoji(raw: Union[str, int], bot: Llama) -> discord.Partia
         # todo: test if emoji is valid.
         # todo: The checks that can be found online only works for custom emojis and not for emojis like 📌 or 📍.
         return discord.PartialEmoji(name=raw.strip())
+
+
+async def on_pm(message: discord.Message, bot: Llama):
+    if not message.guild and message.author != bot.user:
+        err_msg = "DM commands are not supported."
+        await message.channel.send(
+            embed=discord.Embed(
+                title=":exclamation: " + err_msg,
+                description="react with a `:broom:` :broom: emoji to delete existing messages",
+            ),
+            delete_after=5.0,
+        )
+        return commands.NoPrivateMessage(err_msg)
+    else:
+        return False

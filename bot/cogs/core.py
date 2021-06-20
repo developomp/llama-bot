@@ -1,4 +1,5 @@
 from llama import Llama
+from . import _util as util
 
 import discord
 from discord.ext import commands
@@ -14,6 +15,11 @@ class Core(commands.Cog):
 
         # remove any potential existing help command to prevent collision
         self.bot.remove_command("help")
+
+    async def cog_check(self, ctx: commands.Context):
+        if exception_or_bool := await util.on_pm(ctx.message, self.bot):
+            raise exception_or_bool
+        return exception_or_bool
 
     @commands.command(
         help="Shows very basic information about the bot.",

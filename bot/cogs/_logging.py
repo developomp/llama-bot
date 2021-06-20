@@ -1,4 +1,5 @@
 from llama import Llama
+from . import _util as util
 
 import discord
 from discord.ext import commands
@@ -33,6 +34,11 @@ class Logging(commands.Cog):
         self.deletes_per_user: dict[
             int, dict[int, list[discord.RawMessageDeleteEvent]]
         ] = dict()
+
+    async def cog_check(self, ctx: commands.Context):
+        if exception_or_bool := await util.on_pm(ctx.message, self.bot):
+            raise exception_or_bool
+        return exception_or_bool
 
     @commands.Cog.listener()
     async def on_raw_message_edit(self, payload: discord.RawMessageUpdateEvent):

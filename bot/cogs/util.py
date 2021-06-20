@@ -11,6 +11,11 @@ class Util(commands.Cog):
     def __init__(self, bot):
         self.bot: Llama = bot
 
+    async def cog_check(self, ctx: commands.Context):
+        if exception_or_bool := await util.on_pm(ctx.message, self.bot):
+            raise exception_or_bool
+        return exception_or_bool
+
     @commands.command(
         help="Calculates of when a discord ID (aka snowflake) was created.",
         usage="""> {prefix}{command} <snowflake>

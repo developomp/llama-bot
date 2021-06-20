@@ -19,6 +19,11 @@ class SelfRole(commands.Cog):
             ["Self role", "Only admins can create self role message"],
         ]
 
+    async def cog_check(self, ctx: commands.Context):
+        if exception_or_bool := await util.on_pm(ctx.message, self.bot):
+            raise exception_or_bool
+        return exception_or_bool
+
     # self role add
     @commands.Cog.listener()
     async def on_raw_reaction_add(self, payload: discord.RawReactionActionEvent):
