@@ -109,8 +109,12 @@ class Llama(commands.Bot):
         Gets executed when the bot encounters an error.
         """
 
-        err_title: str = "Error"
-        err_description: str = f"Command: {ctx.message.content.split()[0]}"
+        # ignore error if it's simply a missing command
+        if isinstance(error, commands.errors.CommandNotFound):
+            return
+
+        err_title: str = f"Error ({type(error).__name__})"
+        err_description: str = ""
 
         if isinstance(error, util.NotAdminChannel):
             err_title = ":lock: Not in admin channel"
