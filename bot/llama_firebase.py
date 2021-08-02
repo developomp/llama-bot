@@ -1,4 +1,5 @@
-import firebase_admin, firebase_admin.firestore
+import firebase_admin
+import firebase_admin.firestore
 
 
 class LlamaFirebase:
