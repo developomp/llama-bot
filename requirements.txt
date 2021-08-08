@@ -1,4 +1,0 @@
-discord.py
-firebase_admin
-nekos.py
-Pillow
