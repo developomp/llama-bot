@@ -1,0 +1,17 @@
+{
+	"root": true,
+	"parser": "@typescript-eslint/parser",
+	"extends": ["eslint:recommended", "plugin:@typescript-eslint/recommended"],
+	"env": {
+		"node": true,
+		"es6": true
+	},
+	"parserOptions": {
+		"ecmaVersion": 6
+	},
+	"rules": {
+		"semi": ["error", "never"],
+		"quotes": ["error", "double"],
+		"@typescript-eslint/ban-ts-comment": "off"
+	}
+}

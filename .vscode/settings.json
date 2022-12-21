@@ -1,0 +1,18 @@
+{
+	"editor.defaultFormatter": "esbenp.prettier-vscode",
+	"editor.formatOnSave": true,
+	"editor.formatOnPaste": true,
+	"cSpell.words": [
+		"adminsdk",
+		"clapify",
+		"colorette",
+		"cooldown",
+		"firestore",
+		"Neko",
+		"nekos",
+		"OwOify"
+	],
+	"[ignore]": {
+		"editor.defaultFormatter": "foxundermoon.shell-format"
+	}
+}
